@@ -23,7 +23,6 @@ module Representable
 
       options[:parse_pipeline] = ->(input, options) do
         pipeline = Pipeline[*parse_functions] # TODO: AssignFragment
-        pipeline = Pipeline::Insert.(pipeline, SetValue, delete: true) # remove the setter function.
         pipeline = Pipeline::Insert.(pipeline, populator, replace: CreateObject::Populator) # let the actual populator do the job.
         # puts pipeline.extend(Representable::Pipeline::Debug).inspect
         pipeline
