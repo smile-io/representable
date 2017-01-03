@@ -89,7 +89,9 @@ private
     # nested params:
     if options[binding.name.to_sym]
       child_options.merge!(options[binding.name.to_sym]) 
-      child_options[:user_options].merge!(options[binding.name.to_sym].symbolize_keys[:user_options])
+      if options[binding.name.to_sym].key?("user_options")
+        child_options[:user_options].merge!(options[binding.name.to_sym]["user_options"])
+      end
     end
     child_options
   end
