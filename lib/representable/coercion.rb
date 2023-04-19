@@ -1,10 +1,14 @@
-gem 'dry-types', '>= 1.0.0'
+# gem 'dry-types', '>= 1.0.0'
 require "dry-types"
 
 module Representable
   module Coercion
     module Types
-      include Dry::Types()
+      if Gem.loaded_specs['dry-types'].version <= Gem::Version.new('0.14.1')
+        include Dry::Types.module
+      else
+        include Dry::Types()
+      end
     end
     class Coercer
       def initialize(type)
