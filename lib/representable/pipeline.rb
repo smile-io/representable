@@ -4,11 +4,12 @@ module Representable
   class Pipeline < Array
     Stop = Class.new
 
-    # options is mutuable.
+    # options is mutable.
     def call(input, options)
       inject(input) do |memo, block|
         res = evaluate(block, memo, options)
-        return(Stop)if Stop == res
+        return(Stop) if Stop == res
+
         res
       end
     end

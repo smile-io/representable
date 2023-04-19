@@ -1,9 +1,33 @@
 require 'test_helper'
+require 'json'
 
 module JsonTest
+class JSONPublicMethodsTest < Minitest::Spec
+  #---
+  # from_json
+  class BandRepresenter < Representable::Decorator
+    include Representable::JSON
+    property :id
+    property :name
+  end
+
+  let(:json) { '{"id":1,"name":"Rancid"}' }
+
+  it { _(BandRepresenter.new(Band.new).from_json(json)[:id, :name]).must_equal [1, "Rancid"] }
+  it { _(BandRepresenter.new(Band.new).parse(json)[:id, :name]).must_equal [1, "Rancid"] }
+
+  #---
+  # to_json
+  let(:band) { Band.new(1, "Rancid") }
+
+  it { _(BandRepresenter.new(band).to_json).must_equal json }
+  it { _(BandRepresenter.new(band).render).must_equal json }
+end
+
   class APITest < MiniTest::Spec
     Json = Representable::JSON
     Def = Representable::Definition
+
 
     describe "JSON module" do
       before do
@@ -229,9 +253,7 @@ module JsonTest
         assert_json '{"songName":"22 Acacia Avenue"}', song.to_json
       end
     end
-
-end
-
+  end
 
   class CollectionTest < MiniTest::Spec
     describe "collection :name" do
@@ -334,20 +356,20 @@ end
       end
 
       it "renders" do
-        OpenStruct.new(:songs => {"7" => Song.new("Contemplation")}).extend(representer).to_hash.must_equal("songs"=>{"7"=>{"name"=>"Contemplation"}})
+        _(OpenStruct.new(:songs => {"7" => Song.new("Contemplation")}).extend(representer).to_hash).must_equal("songs"=>{"7"=>{"name"=>"Contemplation"}})
       end
 
       describe "parsing" do
         subject { OpenStruct.new.extend(representer) }
-        let (:hsh) { {"7"=>{"name"=>"Contemplation"}} }
+        let(:hsh) { {"7"=>{"name"=>"Contemplation"}} }
 
         it "parses incoming hash" do
-          subject.from_hash("songs"=>hsh).songs.must_equal({"7"=>Song.new("Contemplation")})
+          _(subject.from_hash("songs"=>hsh).songs).must_equal({"7"=>Song.new("Contemplation")})
         end
 
         it "doesn't modify the incoming hash" do
           subject.from_hash("songs"=> incoming_hash = hsh.dup)
-          hsh.must_equal incoming_hash
+          _(hsh).must_equal incoming_hash
         end
       end
     end

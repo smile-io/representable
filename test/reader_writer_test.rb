@@ -10,10 +10,10 @@ class ReaderWriterTest < BaseTest
   subject { OpenStruct.new(:name => "Disorder And Disarray").extend(representer) }
 
   it "uses :writer when rendering" do
-    subject.to_hash(user_options: {nr: 14}).must_equal({"title" => "14) Disorder And Disarray"})
+    _(subject.to_hash(user_options: {nr: 14})).must_equal({"title" => "14) Disorder And Disarray"})
   end
 
   it "uses :reader when parsing" do
-    subject.from_hash({"title" => "15) The Wars End"}).name.must_equal "The Wars End"
+    _(subject.from_hash({"title" => "15) The Wars End"}).name).must_equal "The Wars End"
   end
 end

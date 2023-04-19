@@ -1,10 +1,19 @@
+require 'declarative/definitions'
+
 module Representable
+  autoload :Option, 'representable/option'
+
   # Stores Definitions from ::property. It preserves the adding order (1.9+).
   # Same-named properties get overridden, just like in a Hash.
   #
   # Overwrite definition_class if you need a custom Definition object (helpful when using
   # representable in other gems).
   class Config < ::Declarative::Definitions
+    def initialize(*)
+      super
+      @wrap = nil
+    end
+
     def remove(name)
       delete(name.to_s)
     end
@@ -15,16 +24,17 @@ module Representable
 
     def wrap=(value)
       value = value.to_s if value.is_a?(Symbol)
-      @wrap = Uber::Options::Value.new(value)
+      @wrap = ::Representable::Option(value)
     end
 
     # Computes the wrap string or returns false.
-    def wrap_for(represented, *args, &block)
+    def wrap_for(represented, options = {}, &block)
       return unless @wrap
 
-      value = @wrap.evaluate(represented, *args)
+      value = @wrap.(exec_context: represented, keyword_arguments: options.to_hash)
 
       return value if value != true
+
       infer_name_for(represented.class.name)
     end
 
