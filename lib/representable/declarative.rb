@@ -1,9 +1,4 @@
-require "declarative/schema"
-
 module Representable
-  autoload :Decorator, "representation/decorator"
-  autoload :Definition, "representation/definition"
-
   module Declarative
     def representation_wrap=(name)
       heritage.record(:representation_wrap=, name)
@@ -26,9 +21,9 @@ module Representable
     # them to the original object.
     def nested(name, options={}, &block)
       options = options.merge(
-        getter:   ->(_opts) { self },
-        setter:   ->(opts) { },
-        instance: ->(_opts) { self },
+        getter:   ->(options) { self },
+        setter:   ->(options) { },
+        instance: ->(options) { self },
       )
 
       if block
@@ -52,10 +47,10 @@ module Representable
     NestedBuilder = ->(options) do
       Module.new do
         include Representable # FIXME: do we really need this?
-        feature(*options[:_features])
-        include(*options[:_base]) # base when :inherit, or in decorator.
+        feature *options[:_features]
+        include *options[:_base] # base when :inherit, or in decorator.
 
-        module_eval(&options[:_block])
+        module_eval &options[:_block]
       end
     end
 

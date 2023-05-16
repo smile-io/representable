@@ -22,7 +22,7 @@ class InstanceTest < BaseTest
       end
 
       song = OpenStruct.new.extend(representer).from_hash({"title" => object})
-      _(song.title).must_equal object
+      song.title.must_equal object
     end
   end
 
@@ -36,11 +36,11 @@ class InstanceTest < BaseTest
         :extend => song_representer
     end
 
-    it( "xxx") { _(OpenStruct.new(:song => Song.new(1, "The Answer Is Still No")).extend(representer).
-      from_hash("song" => {"id" => 1}).song).must_equal Song.new(1, "The Answer Is Still No") }
+    it( "xxx") { OpenStruct.new(:song => Song.new(1, "The Answer Is Still No")).extend(representer).
+      from_hash("song" => {"id" => 1}).song.must_equal Song.new(1, "The Answer Is Still No") }
 
-    it { _(OpenStruct.new(:song => Song.new(1, "The Answer Is Still No")).extend(representer).
-      from_hash("song" => {"id" => 2}).song).must_equal Song.new(2, "Invincible") }
+    it { OpenStruct.new(:song => Song.new(1, "The Answer Is Still No")).extend(representer).
+      from_hash("song" => {"id" => 2}).song.must_equal Song.new(2, "Invincible") }
   end
 
 
@@ -55,13 +55,13 @@ class InstanceTest < BaseTest
     end
 
     it {
-      album= Struct.new(:songs).new([
+      album= Struct.new(:songs).new(songs = [
       Song.new(1, "The Answer Is Still No"),
       Song.new(2, "")])
 
-      _(album.
+      album.
         extend(representer).
-        from_hash("songs" => [{"id" => 2},{"id" => 2, "title"=>"The Answer Is Still No"}]).songs).must_equal [
+        from_hash("songs" => [{"id" => 2},{"id" => 2, "title"=>"The Answer Is Still No"}]).songs.must_equal [
           Song.new(2, "Invincible"), Song.new(2, "The Answer Is Still No")]
     }
   end
@@ -71,8 +71,8 @@ class InstanceTest < BaseTest
       property :song, :instance => lambda { |options| Struct.new(:args, :id).new([options[:fragment], options[:user_options]]) }, :extend => song_representer
     end
 
-    it { _(OpenStruct.new(:song => Song.new(1, "The Answer Is Still No")).extend(representer).
-      from_hash({"song" => {"id" => 1}}, user_options: { volume: 1 }).song.args).must_equal([{"id"=>1}, {:volume=>1}]) }
+    it { OpenStruct.new(:song => Song.new(1, "The Answer Is Still No")).extend(representer).
+      from_hash({"song" => {"id" => 1}}, user_options: { volume: 1 }).song.args.must_equal([{"id"=>1}, {:volume=>1}]) }
   end
 
   # TODO: raise and test instance:{nil}
@@ -81,7 +81,7 @@ class InstanceTest < BaseTest
   #     property :song, :instance => lambda { |*| nil }, :extend => song_representer
   #   end
 
-  #   let(:hit) { hit = OpenStruct.new(:song => song).extend(representer) }
+  #   let (:hit) { hit = OpenStruct.new(:song => song).extend(representer) }
 
   #   it "calls #to_hash on song instance, nothing else" do
   #     hit.to_hash.must_equal("song"=>{"title"=>"Resist Stance"})
@@ -117,13 +117,13 @@ class InstanceTest < BaseTest
         extend(representer).
         from_hash("songs" => [{"title" => "The Answer Is Still No"}, {"title" => "Invincible"}])
 
-      _(album.songs).must_equal [
+      album.songs.must_equal [
         Song.new(1, "The Answer Is Still No"),
         Song.new(2, "Invincible")]
 
-      _(songs.object_id).must_equal album.songs.object_id
-      _(songs[0].object_id).must_equal album.songs[0].object_id
-      _(songs[1].object_id).must_equal album.songs[1].object_id
+      songs.object_id.must_equal album.songs.object_id
+      songs[0].object_id.must_equal album.songs[0].object_id
+      songs[1].object_id.must_equal album.songs[1].object_id
     }
   end
 
@@ -146,17 +146,17 @@ class InstanceTest < BaseTest
       Song.new(1, "The Answer Is Still No"),
       Song.new(2, "Invncble")])
 
-      _(album.
+      album.
         extend(representer).
         from_hash("songs" => [{"id" => 2, "title" => "Invincible"}]).
-        songs).must_equal [
+        songs.must_equal [
           Song.new(1, "The Answer Is Still No"),
           Song.new(2, "Invincible")]
           # TODO: check elements object_id!
 
-      _(songs.object_id).must_equal album.songs.object_id
-      _(songs[0].object_id).must_equal album.songs[0].object_id
-      _(songs[1].object_id).must_equal album.songs[1].object_id
+      songs.object_id.must_equal album.songs.object_id
+      songs[0].object_id.must_equal album.songs[0].object_id
+      songs[1].object_id.must_equal album.songs[1].object_id
     }
   end
 
@@ -178,15 +178,15 @@ class InstanceTest < BaseTest
       album= Struct.new(:songs).new(songs = [
         Song.new(1, "The Answer Is Still No")])
 
-      _(album.
+      album.
         extend(representer).
         from_hash("songs" => [{"title" => "Invincible"}]).
-        songs).must_equal [
+        songs.must_equal [
           Song.new(1, "The Answer Is Still No"),
           Song.new(2, "Invincible")]
 
-      _(songs.object_id).must_equal album.songs.object_id
-      _(songs[0].object_id).must_equal album.songs[0].object_id
+      songs.object_id.must_equal album.songs.object_id
+      songs[0].object_id.must_equal album.songs[0].object_id
     }
   end
 
@@ -212,15 +212,15 @@ class InstanceTest < BaseTest
         Song.new(1, "The Answer Is Still No"),
         Song.new(2, "Invincible")])
 
-      _(album.
+      album.
         extend(representer).
         from_hash("songs" => [{"replace_id"=>2, "id" => 3, "title" => "Soulmate"}]).
-        songs).must_equal [
+        songs.must_equal [
           Song.new(1, "The Answer Is Still No"),
           Song.new(3, "Soulmate")]
 
-      _(songs.object_id).must_equal album.songs.object_id
-      _(songs[0].object_id).must_equal album.songs[0].object_id
+      songs.object_id.must_equal album.songs.object_id
+      songs[0].object_id.must_equal album.songs[0].object_id
     }
   end
 
@@ -235,13 +235,13 @@ class InstanceTest < BaseTest
       album= Struct.new(:songs).new(songs = [
         Song.new(1, "The Answer Is Still No")])
 
-      _(album.
+      album.
         extend(representer).
         from_hash("songs" => [{"title" => "Invincible"}]).
-        songs).must_equal [
+        songs.must_equal [
           Song.new(nil, "Invincible")]
 
-      _(songs.object_id).wont_equal album.songs.object_id
+      songs.object_id.wont_equal album.songs.object_id
     }
   end
 end

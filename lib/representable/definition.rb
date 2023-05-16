@@ -1,10 +1,7 @@
-require 'declarative/definitions'
+require "uber/options"
+require "representable/populator"
 
 module Representable
-  autoload :Pipeline, "representable/pipeline"
-  autoload :Populator, "representable/populator"
-  autoload :Option, "representable/option"
-
   # Created at class compile time. Keeps configuration options for one property.
   class Definition < ::Declarative::Definitions::Definition
 
@@ -57,7 +54,6 @@ module Representable
 
     def representable?
       return if self[:representable] == false
-
       self[:representable] or typed?
     end
 
@@ -106,7 +102,7 @@ module Representable
       @runtime_options = {}
 
       for name, value in options
-        value = ::Representable::Option(value) if dynamic_options.include?(name)
+        value = Uber::Options::Value.new(value) if dynamic_options.include?(name)
         @runtime_options[name] = value
       end
     end

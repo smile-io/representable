@@ -7,6 +7,8 @@ require "pp"
 source = OpenStruct.new(name: "30 Years Live", songs: [
   OpenStruct.new(id: 1, title: "Dear Beloved"), OpenStruct.new(id: 2, title: "Fuck Armageddon")])
 
+pp source
+
 require "representable/object"
 
 class AlbumRepresenter < Representable::Decorator
@@ -25,3 +27,5 @@ Song = Struct.new(:title)
 target = Album.new
 
 AlbumRepresenter.new(target).from_object(source)
+
+pp target

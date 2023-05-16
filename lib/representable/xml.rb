@@ -1,14 +1,15 @@
-gem 'nokogiri', '> 1.10.8'
-require 'nokogiri'
-
 require 'representable'
+require 'representable/xml/binding'
+require 'representable/xml/collection'
+
+begin
+  require 'nokogiri'
+rescue LoadError => _
+  abort "Missing dependency 'nokogiri' for Representable::XML. See dependencies section in README.md for details."
+end
 
 module Representable
   module XML
-    autoload :Binding, 'representable/xml/binding'
-    autoload :Collection, 'representable/xml/collection'
-    autoload :Namespace, 'representable/xml/namespace'
-
     def self.included(base)
       base.class_eval do
         include Representable
@@ -45,18 +46,15 @@ module Representable
 
     # Returns a Nokogiri::XML object representing this object.
     def to_node(options={})
-      options[:doc] = Nokogiri::XML::Document.new # DISCUSS: why do we need a fresh Document here?
+      options[:doc] ||= Nokogiri::XML::Document.new
       root_tag = options[:wrap] || representation_wrap(options)
 
-      create_representation_with(Node(options[:doc], root_tag.to_s), options, Binding)
+      create_representation_with(Nokogiri::XML::Node.new(root_tag.to_s, options[:doc]), options, Binding)
     end
 
     def to_xml(*args)
       to_node(*args).to_s
     end
-
-    alias_method :render, :to_xml
-    alias_method :parse, :from_xml
 
   private
     def remove_namespaces?

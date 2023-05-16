@@ -17,22 +17,22 @@ class IncludeExcludeTest < Minitest::Spec
     end
   end
 
-  let(:song) { Song.new("Listless", Artist.new("7yearsbadluck", 1  )) }
-  let(:decorator) { representer.new(song) }
+  let (:song) { Song.new("Listless", Artist.new("7yearsbadluck", 1  )) }
+  let (:decorator) { representer.new(song) }
 
   describe "#from_hash" do
     it "accepts :exclude option" do
       decorator.from_hash({"title"=>"Don't Smile In Trouble", "artist"=>{"id"=>2}}, exclude: [:title])
 
-      _(song.title).must_equal "Listless"
-      _(song.artist).must_equal Artist.new(nil, 2)
+      song.title.must_equal "Listless"
+      song.artist.must_equal Artist.new(nil, 2)
     end
 
     it "accepts :include option" do
       decorator.from_hash({"title"=>"Don't Smile In Trouble", "artist"=>{"id"=>2}}, include: [:title])
 
-      _(song.title).must_equal "Don't Smile In Trouble"
-      _(song.artist).must_equal Artist.new("7yearsbadluck", 1)
+      song.title.must_equal "Don't Smile In Trouble"
+      song.artist.must_equal Artist.new("7yearsbadluck", 1)
     end
 
     it "accepts nested :exclude/:include option" do
@@ -44,30 +44,30 @@ class IncludeExcludeTest < Minitest::Spec
         }
       )
 
-      _(song.title).must_equal "Listless"
-      _(song.artist).must_equal Artist.new("Foo", nil, [Song.new("Listless", nil, nil)])
+      song.title.must_equal "Listless"
+      song.artist.must_equal Artist.new("Foo", nil, [Song.new("Listless", nil, nil)])
     end
   end
 
   describe "#to_hash" do
     it "accepts :exclude option" do
-      _(decorator.to_hash(exclude: [:title])).must_equal({"artist"=>{"name"=>"7yearsbadluck", "id"=>1}})
+      decorator.to_hash(exclude: [:title]).must_equal({"artist"=>{"name"=>"7yearsbadluck", "id"=>1}})
     end
 
     it "accepts :include option" do
-      _(decorator.to_hash(include: [:title])).must_equal({"title"=>"Listless"})
+      decorator.to_hash(include: [:title]).must_equal({"title"=>"Listless"})
     end
 
     it "accepts nested :exclude/:include option" do
       decorator = representer.new(Song.new("Listless", Artist.new("7yearsbadluck", 1, [Song.new("C.O.A.B.I.E.T.L.")])))
 
-      _(decorator.to_hash(
+      decorator.to_hash(
         exclude: [:title],
         artist: {
           exclude: [:id],
           songs: { include: [:title] }
         }
-      )).must_equal({"artist"=>{"name"=>"7yearsbadluck", "songs"=>[{"title"=>"C.O.A.B.I.E.T.L."}]}})
+      ).must_equal({"artist"=>{"name"=>"7yearsbadluck", "songs"=>[{"title"=>"C.O.A.B.I.E.T.L."}]}})
     end
   end
 
@@ -82,7 +82,7 @@ class IncludeExcludeTest < Minitest::Spec
 
     # FIXME: we should test all representable-options (:include, :exclude, ?)
 
-    _(Cover.new("Roxanne", Cover.new("Roxanne (Don't Put On The Red Light)")).extend(cover_rpr).
-      to_hash(:include => [:original])).must_equal({"original"=>{"title"=>"Roxanne (Don't Put On The Red Light)"}})
+    Cover.new("Roxanne", Cover.new("Roxanne (Don't Put On The Red Light)")).extend(cover_rpr).
+      to_hash(:include => [:original]).must_equal({"original"=>{"title"=>"Roxanne (Don't Put On The Red Light)"}})
   end
 end

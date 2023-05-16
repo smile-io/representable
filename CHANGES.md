@@ -1,36 +1,3 @@
-# 3.2.0
-* Drop support for Virtus Coercion
-* Fix deprecation warning with Nokogiri 1.13.0
-
-# 3.1.1
-
-* Upgrade `trailblazer-option` to `0.1.1` which supports passing an empty `keyword_arguments`.
-
-# 3.1.0
-* Remove circular require
-* Use Dry-types 1.0.0+ as coercion library
-* Renamed Coercion to VirtusCoercion to support old codebases
-* Replace `declarative-option` with [`trailblazer-option`](https://github.com/trailblazer/trailblazer-option)
-
-# 3.0.4
-
-* Add proper XML namespace support.
-* [internal] Replace `XML::Binding#node_for` with function `XML::Node`.
-
-# 3.0.3
-
-* Replace `Uber::Option` with the new [`Declarative::Option`](https://github.com/apotonick/declarative-option). This should result in a significant performance boost.
-
-# 3.0.2
-
-* Initialize `Config@wrap` to avoid Ruby's warning.
-* Add `#render` and `#parse` alias methods to all format modules as a generic entry point.
-* In `GetValue`, use `public_send` now.
-
-# 3.0.1
-
-* Loosen `uber` dependency.
-
 # 3.0.0
 
 * Removed deprecations from 2.4.

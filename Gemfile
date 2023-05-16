@@ -1,11 +1,19 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
 gemspec
 
-group :test do
-  gem "minitest-line"
-  gem "multi_json", require: false
-  gem "nokogiri", require: false
+platform :rbx do
+  gem "psych"
+  gem "rubysl-irb"
+  gem "json_pure"
 end
-gem 'pry-byebug'
 
+group :test do
+  gem "nokogiri", require: false
+  gem "multi_json", require: false
+  gem "minitest-line"
+  gem "pry"
+end
+
+# gem "declarative", path: "../declarative"
+# gem "declarative", github: "apotonick/declarative"

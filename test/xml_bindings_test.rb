@@ -1,5 +1,9 @@
 require 'test_helper'
+require 'representable/json'  # FIXME.
+require 'representable/xml/collection'
 require 'representable/xml/hash'
+
+require 'representable/xml'
 
 class XMLBindingTest < MiniTest::Spec
   module SongRepresenter

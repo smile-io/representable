@@ -16,11 +16,11 @@ class PopulatorTest < Minitest::Spec
       end
     end
 
-    let(:album) { Album.new([]) }
+    let (:album) { Album.new([]) }
 
     it do
       album.extend(representer).from_hash("songs"=>[{"id"=>1}, {"id"=>2}], "artist"=>{"name"=>"Waste"})
-      _(album.inspect).must_equal "#<struct PopulatorTest::Album songs=[#<struct PopulatorTest::Song id=1>, #<struct PopulatorTest::Song id=2>], artist=#<struct PopulatorTest::Artist name=\"Waste\">>"
+      album.inspect.must_equal "#<struct PopulatorTest::Album songs=[#<struct PopulatorTest::Song id=1>, #<struct PopulatorTest::Song id=2>], artist=#<struct PopulatorTest::Artist name=\"Waste\">>"
     end
   end
 
@@ -37,7 +37,7 @@ class PopulatorFindOrInstantiateTest < Minitest::Spec
     end
   end
 
-  Composer = Class.new
+  Composer = Struct.new(:song)
   Composer.class_eval do
     def song=(v)
       @song = v
@@ -55,22 +55,22 @@ class PopulatorFindOrInstantiateTest < Minitest::Spec
       end
     end
 
-    let(:album) { Composer.new.extend(representer).extend(Representable::Debug) }
+    let (:album) { Composer.new.extend(representer).extend(Representable::Debug) }
 
     it "finds by :id and creates new without :id" do
       album.from_hash({"song"=>{"id" => 1, "title"=>"Resist Stance"}})
 
-      _(album.song.title).must_equal "Resist Stance" # note how title is updated from "Resist Stan"
-      _(album.song.id).must_equal 1
-      _(album.song.uid).must_equal "abcd" # not changed via populator, indicating this is a formerly "persisted" object.
+      album.song.title.must_equal "Resist Stance" # note how title is updated from "Resist Stan"
+      album.song.id.must_equal 1
+      album.song.uid.must_equal "abcd" # not changed via populator, indicating this is a formerly "persisted" object.
     end
 
     it "creates new without :id" do
       album.from_hash({"song"=>{"title"=>"Lower"}})
 
-      _(album.song.title).must_equal "Lower"
-      _(album.song.id).must_be_nil
-      _(album.song.uid).must_be_nil
+      album.song.title.must_equal "Lower"
+      album.song.id.must_equal nil
+      album.song.uid.must_equal nil
     end
   end
 
@@ -82,7 +82,7 @@ class PopulatorFindOrInstantiateTest < Minitest::Spec
       end
     end
 
-    let(:album) { Struct.new(:songs).new([]).extend(representer) }
+    let (:album) { Struct.new(:songs).new([]).extend(representer) }
 
     it "finds by :id and creates new without :id" do
       album.from_hash({"songs"=>[
@@ -90,13 +90,13 @@ class PopulatorFindOrInstantiateTest < Minitest::Spec
         {"title"=>"Suffer"}
       ]})
 
-      _(album.songs[0].title).must_equal "Resist Stance" # note how title is updated from "Resist Stan"
-      _(album.songs[0].id).must_equal 1
-      _(album.songs[0].uid).must_equal "abcd" # not changed via populator, indicating this is a formerly "persisted" object.
+      album.songs[0].title.must_equal "Resist Stance" # note how title is updated from "Resist Stan"
+      album.songs[0].id.must_equal 1
+      album.songs[0].uid.must_equal "abcd" # not changed via populator, indicating this is a formerly "persisted" object.
 
-      _(album.songs[1].title).must_equal "Suffer"
-      _(album.songs[1].id).must_be_nil
-      _(album.songs[1].uid).must_be_nil
+      album.songs[1].title.must_equal "Suffer"
+      album.songs[1].id.must_equal nil
+      album.songs[1].uid.must_equal nil
     end
 
     # TODO: test with existing collection

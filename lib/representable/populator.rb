@@ -13,7 +13,7 @@ module Representable
     def self.apply!(options)
       return unless populator = options[:populator]
 
-      options[:parse_pipeline] = ->(_input, _opts) do
+      options[:parse_pipeline] = ->(input, options) do
         pipeline = Pipeline[*parse_functions] # TODO: AssignFragment
         pipeline = Pipeline::Insert.(pipeline, populator, replace: CreateObject::Populator) # let the actual populator do the job.
         # puts pipeline.extend(Representable::Pipeline::Debug).inspect

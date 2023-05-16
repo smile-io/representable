@@ -1,14 +1,8 @@
 require 'representable/binding'
+require 'representable/hash/binding.rb'
 
 module Representable
   module XML
-    module_function def Node(document, name, attributes={})
-      node = Nokogiri::XML::Node.new(name.to_s, document) # Java::OrgW3cDom::DOMException: NAMESPACE_ERR: An attempt is made to create or change an object in a way which is incorrect with regard to namespaces.
-
-      attributes.each { |k, v| node[k] = v } # TODO: benchmark.
-      node
-    end
-
     class Binding < Representable::Binding
       def self.build_for(definition)
         return Collection.new(definition)      if definition.array?
@@ -16,7 +10,6 @@ module Representable
         return AttributeHash.new(definition)   if definition.hash? and definition[:use_attributes]
         return Attribute.new(definition)       if definition[:attribute]
         return Content.new(definition)         if definition[:content]
-
         new(definition)
       end
 
@@ -24,7 +17,7 @@ module Representable
         wrap_node = parent
 
         if wrap = self[:wrap]
-          parent << wrap_node = XML::Node(parent.document, wrap)
+          parent << wrap_node = node_for(parent, wrap)
         end
 
         wrap_node << serialize_for(fragments, parent, as)
@@ -39,15 +32,12 @@ module Representable
 
       # Creates wrapped node for the property.
       def serialize_for(value, parent, as)
-        node = XML::Node(parent.document, as) # node doesn't have attr="" attributes!!!
-        serialize_node(node, value, as)
+        node = node_for(parent, as)
+        serialize_node(node, value)
       end
 
-      def serialize_node(node, value, as)
-        if typed?
-          value.name = as if as != self[:name]
-          return value
-        end
+      def serialize_node(node, value)
+        return value if typed?
 
         node.content = value
         node
@@ -70,7 +60,11 @@ module Representable
       def find_nodes(doc, as)
         selector  = as
         selector  = "#{self[:wrap]}/#{as}" if self[:wrap]
-        doc.xpath(selector) # nodes
+        nodes     = doc.xpath(selector)
+      end
+
+      def node_for(parent, name)
+        Nokogiri::XML::Node.new(name.to_s, parent.document)
       end
 
       def content_for(node) # TODO: move this into a ScalarDecorator.
@@ -106,8 +100,8 @@ module Representable
       class Hash < Collection
         def serialize_for(value, parent, as)
           set_for(parent, value.collect do |k, v|
-            node = XML::Node(parent.document, k)
-            serialize_node(node, v, as)
+            node = node_for(parent, k)
+            serialize_node(node, v)
           end)
         end
 
