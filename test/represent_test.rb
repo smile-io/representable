@@ -1,8 +1,8 @@
 require 'test_helper'
 
 class RepresentTest < MiniTest::Spec
-  let(:songs) { [song, Song.new("Can't Take Them All")] }
-  let(:song) { Song.new("Days Go By") }
+  let (:songs) { [song, Song.new("Can't Take Them All")] }
+  let (:song) { Song.new("Days Go By") }
 
   for_formats(
     :hash => [Representable::Hash, out=[{"name" => "Days Go By"}, {"name"=>"Can't Take Them All"}], out],
@@ -12,9 +12,9 @@ class RepresentTest < MiniTest::Spec
 
     # Representer.represents detects collection.
     describe "Module#to_/from_#{format}" do
-      let(:format) { format }
+      let (:format) { format }
 
-      let(:representer) {
+      let (:representer) {
         Module.new do
           include mod
           property :name
@@ -24,13 +24,13 @@ class RepresentTest < MiniTest::Spec
       }
 
       it { render(representer.represent(songs)).must_equal_document output }
-      it { _(parse(representer.represent([]), input)).must_equal songs }
+      it { parse(representer.represent([]), input).must_equal songs }
     end
 
     # Decorator.represents detects collection.
     describe "Decorator#to_/from_#{format}" do
-      let(:format) { format }
-      let(:representer) {
+      let (:format) { format }
+      let (:representer) {
         Class.new(Representable::Decorator) do
           include mod
           property :name
@@ -40,7 +40,7 @@ class RepresentTest < MiniTest::Spec
       }
 
       it { render(representer.represent(songs)).must_equal_document output }
-      it("ficken") { _(parse(representer.represent([]), input)).must_equal songs }
+      it("ficken") { parse(representer.represent([]), input).must_equal songs }
     end
   end
 
@@ -53,9 +53,9 @@ class RepresentTest < MiniTest::Spec
 
     # Representer.represents detects singular.
     describe "Module#to_/from_#{format}" do
-      let(:format) { format }
+      let (:format) { format }
 
-      let(:representer) {
+      let (:representer) {
         Module.new do
           include mod
           property :name
@@ -65,14 +65,14 @@ class RepresentTest < MiniTest::Spec
       }
 
       it { render(representer.represent(song)).must_equal_document output }
-      it { _(parse(representer.represent(Song.new), input)).must_equal song }
+      it { parse(representer.represent(Song.new), input).must_equal song }
     end
 
 
     # Decorator.represents detects singular.
     describe "Decorator#to_/from_#{format}" do
-      let(:format) { format }
-      let(:representer) {
+      let (:format) { format }
+      let (:representer) {
         Class.new(Representable::Decorator) do
           include mod
           property :name
@@ -82,7 +82,7 @@ class RepresentTest < MiniTest::Spec
       }
 
       it { render(representer.represent(song)).must_equal_document output }
-      it { _(parse(representer.represent(Song.new), input)).must_equal song }
+      it { parse(representer.represent(Song.new), input).must_equal song }
     end
   end
 end

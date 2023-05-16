@@ -2,8 +2,7 @@
 module Representable
   module Binding::Factories
     def pipeline_for(name, input, options)
-      return yield unless (proc = @definition[name])
-
+      return yield unless proc = @definition[name]
       # proc.(self, options)
       instance_exec(input, options, &proc)
     end
@@ -12,7 +11,6 @@ module Representable
     def collect_for(item_functions)
       return [Collect[*item_functions]] if array?
       return [Collect::Hash[*item_functions]] if self[:hash]
-
       item_functions
     end
 

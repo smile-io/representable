@@ -1,8 +1,7 @@
 require "uber/delegates"
-require "uber/callable"
+
 require "declarative/schema"
 
-require "representable/option"
 require "representable/config"
 require "representable/definition"
 require "representable/declarative"
@@ -16,17 +15,6 @@ require "representable/for_collection"
 require "representable/represent"
 
 module Representable
-  autoload :Binding, 'representable/binding'
-  autoload :HashMethods, 'representable/hash_methods'
-  autoload :Decorator, 'representable/decorator'
-
-  autoload :Hash, 'representable/hash'
-  autoload :JSON, 'representable/json'
-  autoload :Object, 'representable/object'
-  autoload :YAML, 'representable/yaml'
-  autoload :XML, 'representable/xml'
-
-
   attr_writer :representable_attrs
 
   def self.included(base)
@@ -43,7 +31,7 @@ module Representable
 private
   # Reads values from +doc+ and sets properties accordingly.
   def update_properties_from(doc, options, format)
-    propagated_options = normalize_options(**options)
+    propagated_options = normalize_options(options)
 
     representable_map!(doc, propagated_options, format, :uncompile_fragment)
     represented
@@ -51,12 +39,25 @@ private
 
   # Compiles the document going through all properties.
   def create_representation_with(doc, options, format)
-    propagated_options = normalize_options(**options)
+    propagated_options = normalize_options(options)
 
     representable_map!(doc, propagated_options, format, :compile_fragment)
     doc
   end
 
+  class Binding::Map < Array
+    def call(method, options)
+      each do |bin|
+        options[:binding] = bin # this is so much faster than options.merge().
+        bin.send(method, options)
+      end
+    end
+
+     # TODO: Merge with Definitions.
+    def <<(binding) # can be slow. this is compile time code.
+      (existing = find { |bin| bin.name == binding.name }) ? self[index(existing)] = binding : super(binding)
+    end
+  end
 
   def representable_map(options, format)
     Binding::Map.new(representable_bindings_for(format, options))
@@ -72,8 +73,9 @@ private
     representable_attrs.collect {|definition| format.build(definition) }
   end
 
-  def normalize_options(user_options: {}, **options)
-    { user_options: user_options }.merge(options)
+  def normalize_options(options)
+    return options if options.any?
+    {user_options: {}}.merge(options) # TODO: use keyword args once we drop 2.0.
   end
 
   # Prepares options for a particular nested representer.
@@ -98,8 +100,8 @@ private
     @representable_attrs ||= self.class.definitions
   end
 
-  def representation_wrap(options = {})
-    representable_attrs.wrap_for(represented, options)
+  def representation_wrap(*args)
+    representable_attrs.wrap_for(represented, *args)
   end
 
   def represented
@@ -120,4 +122,8 @@ private
       represented.extend(self)
     end
   end
+
+  # require "representable/deprecations"
 end
+
+require 'representable/autoload'

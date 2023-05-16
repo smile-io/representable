@@ -1,8 +1,8 @@
 require 'test_helper'
 
 class InlineTest < MiniTest::Spec
-  let(:song)    { Song.new("Alive") }
-  let(:request) { representer.prepare(OpenStruct.new(:song => song)) }
+  let (:song)    { Song.new("Alive") }
+  let (:request) { representer.prepare(OpenStruct.new(:song => song)) }
 
   {
     :hash => [Representable::Hash, {"song"=>{"name"=>"Alive"}}, {"song"=>{"name"=>"You've Taken Everything"}}],
@@ -19,10 +19,10 @@ class InlineTest < MiniTest::Spec
         end
       end
 
-      let(:format) { format }
+      let (:format) { format }
 
       it { render(request).must_equal_document output }
-      it { _(parse(request, input).song.name).must_equal "You've Taken Everything"}
+      it { parse(request, input).song.name.must_equal "You've Taken Everything"}
     end
   end
 
@@ -36,7 +36,7 @@ class InlineTest < MiniTest::Spec
     collection_options ||= {}
 
     describe "[#{format}] collection with :class" do
-      let(:request) { representer.prepare(OpenStruct.new(:songs => [song])) }
+      let (:request) { representer.prepare(OpenStruct.new(:songs => [song])) }
 
       representer!(:module => mod) do
         collection :songs, collection_options.merge(:class => Song) do
@@ -44,10 +44,10 @@ class InlineTest < MiniTest::Spec
         end
       end
 
-      let(:format) { format } # FIXME: why do we have to define this?
+      let (:format) { format } # FIXME: why do we have to define this?
 
       it { render(request).must_equal_document output }
-      it { _(parse(request, input).songs.first.name).must_equal "You've Taken Everything"}
+      it { parse(request, input).songs.first.name.must_equal "You've Taken Everything"}
     end
   end
 
@@ -58,7 +58,7 @@ class InlineTest < MiniTest::Spec
       end
     end
 
-    it { _(request.to_hash).must_equal({"song"=>{"name"=>"Alive"}}) }
+    it { request.to_hash.must_equal({"song"=>{"name"=>"Alive"}}) }
   end
 
 
@@ -76,14 +76,14 @@ class InlineTest < MiniTest::Spec
       end
 
       it "doesn't change represented object" do
-        _(request.send("from_#{format}", input).song).must_equal song
+        request.send("from_#{format}", input).song.must_equal song
       end
     end
   end
 
 
   describe "inheriting from outer representer" do
-    let(:request) { Struct.new(:song, :requester).new(song, "Josephine") }
+    let (:request) { Struct.new(:song, :requester).new(song, "Josephine") }
 
     [false, true].each do |is_decorator| # test for module and decorator.
       representer!(:decorator => is_decorator) do
@@ -94,10 +94,10 @@ class InlineTest < MiniTest::Spec
         end
       end
 
-      let(:decorator) { representer.prepare(request) }
+      let (:decorator) { representer.prepare(request) }
 
-      it { _(decorator.to_hash).must_equal({"requester"=>"Josephine", "song"=>{"name"=>"Alive"}}) }
-      it { _(decorator.from_hash({"song"=>{"name"=>"You've Taken Everything"}}).song.name).must_equal "You've Taken Everything"}
+      it { decorator.to_hash.must_equal({"requester"=>"Josephine", "song"=>{"name"=>"Alive"}}) }
+      it { decorator.from_hash({"song"=>{"name"=>"You've Taken Everything"}}).song.name.must_equal "You've Taken Everything"}
     end
   end
 
@@ -110,7 +110,7 @@ class InlineTest < MiniTest::Spec
 
     it "uses an inline decorator and doesn't alter represented" do
       representer.prepare(Struct.new(:song).new(song)).to_hash
-      _(song).wont_be_kind_of Representable
+      song.wont_be_kind_of Representable
     end
   end
 
@@ -128,7 +128,7 @@ class InlineTest < MiniTest::Spec
   #   end
 
   #   describe ":getter with inline representer" do
-  #     let(:format) { format }
+  #     let (:format) { format }
 
   #     representer!(:module => mod) do
   #       self.representation_wrap = :album
@@ -136,7 +136,7 @@ class InlineTest < MiniTest::Spec
   #       property :artist, :getter => lambda { |args| represented }, :extend => ArtistRepresenter
   #     end
 
-  #     let(:album) { OpenStruct.new(:label => "Epitaph").extend(representer) }
+  #     let (:album) { OpenStruct.new(:label => "Epitaph").extend(representer) }
 
   #     it "renders nested Album-properties in separate section" do
   #       render(album).must_equal_document output
@@ -157,7 +157,7 @@ class InlineTest < MiniTest::Spec
     end
 
     describe ":getter with :decorator" do
-      let(:format) { format }
+      let (:format) { format }
 
       representer!(:module => mod) do
         self.representation_wrap = "album"
@@ -165,7 +165,7 @@ class InlineTest < MiniTest::Spec
         property :artist, :getter => lambda { |args| represented }, :decorator => ArtistDecorator
       end
 
-      let(:album) { OpenStruct.new(:label => "Epitaph").extend(representer) }
+      let (:album) { OpenStruct.new(:label => "Epitaph").extend(representer) }
 
       it "renders nested Album-properties in separate section" do
         render(album).must_equal_document output
@@ -182,7 +182,7 @@ class InlineTest < MiniTest::Spec
   }) do |format, mod, output|
 
     describe "helper method within inline representer [#{format}]" do
-      let(:format) { format }
+      let (:format) { format }
 
       representer!(:module => mod, :decorator => true) do
         self.representation_wrap = :request if format == :xml
@@ -199,7 +199,7 @@ class InlineTest < MiniTest::Spec
         end
       end
 
-      let(:request) { representer.prepare(OpenStruct.new(:song => Song.new("Alive"))) }
+      let (:request) { representer.prepare(OpenStruct.new(:song => Song.new("Alive"))) }
 
       it do
         render(request).must_equal_document output
@@ -221,8 +221,8 @@ class InlineTest < MiniTest::Spec
       end
     end
 
-    it do _(OpenStruct.new(:song => OpenStruct.new(:title => "The Fever And The Sound", :artist => "Strung Out")).extend(representer).
-      to_hash).
+    it do OpenStruct.new(:song => OpenStruct.new(:title => "The Fever And The Sound", :artist => "Strung Out")).extend(representer).
+      to_hash.
       must_equal({"song"=>{"artist"=>"Strung Out", "title"=>"The Fever And The Sound"}})
     end
   end
@@ -246,7 +246,7 @@ class InlineTest < MiniTest::Spec
       end
     end
 
-    it { _(Object.new.extend(Mod).to_hash).must_equal("song"=>{"duration"=>"6:53"}) }
+    it { Object.new.extend(Mod).to_hash.must_equal("song"=>{"duration"=>"6:53"}) }
   end
 
   # define method inline with Decorator
@@ -267,6 +267,6 @@ class InlineTest < MiniTest::Spec
       end
     end
 
-    it { _(dec.new(Object.new).to_hash).must_equal("song"=>{"duration"=>"6:53"}) }
+    it { dec.new(Object.new).to_hash.must_equal("song"=>{"duration"=>"6:53"}) }
   end
 end

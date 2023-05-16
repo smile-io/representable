@@ -6,7 +6,7 @@ class DecoratorScopeTest < MiniTest::Spec
     property :title, :getter => lambda { |*| title_from_representer }, :decorator_scope => true
   end
 
-  let(:representer_with_method) {
+  let (:representer_with_method) {
     Module.new do
       include Representable::Hash
       property :title, :decorator_scope => true
@@ -15,14 +15,14 @@ class DecoratorScopeTest < MiniTest::Spec
    }
 
   it "executes lambdas in represented context" do
-    _(Class.new do
+    Class.new do
       def title_from_representer
         "Sounds Of Silence"
       end
-    end.new.extend(representer).to_hash).must_equal({"title"=>"Sounds Of Silence"})
+    end.new.extend(representer).to_hash.must_equal({"title"=>"Sounds Of Silence"})
   end
 
   it "executes method in represented context" do
-    _(Object.new.extend(representer_with_method).to_hash).must_equal({"title"=>"Crystal Planet"})
+    Object.new.extend(representer_with_method).to_hash.must_equal({"title"=>"Crystal Planet"})
   end
 end
