@@ -1,16 +1,20 @@
+require 'pry-byebug'
 require 'representable'
 
-require "json"
-require "psych"
-
-require 'representable/json'
-require 'representable/xml'
-require 'representable/yaml'
 require 'minitest/autorun'
 require 'test_xml/mini_test'
 
 require "representable/debug"
+require 'minitest/assertions'
 
+module MiniTest::Assertions
+  def assert_equal_xml(text, subject)
+    assert_equal (text.gsub("\n", "").gsub(/(\s\s+)/, "")), subject.gsub("\n", "").gsub(/(\s\s+)/, "")
+  end
+end
+String.infect_an_assertion :assert_equal_xml, :must_xml
+
+# TODO: delete all that in 4.0:
 class Album
   attr_accessor :songs, :best_song
   def initialize(songs=nil, best_song=nil)
@@ -45,7 +49,7 @@ module AssertJson
   module Assertions
     def assert_json(expected, actual, msg=nil)
       msg = message(msg, "") { diff expected, actual }
-      assert(expected.split("").sort == actual.split("").sort, msg)
+      assert_equal(expected.split("").sort, actual.split("").sort, msg)
     end
   end
 end
@@ -83,7 +87,7 @@ MiniTest::Spec.class_eval do
   end
 
   def self.representer!(options={}, &block)
-    fmt = options # we need that so the 2nd call to ::let (within a ::describe) remembers the right format.
+    fmt = options # we need that so the 2nd call to ::let(within a ::describe) remembers the right format.
 
     name   = options[:name]   || :representer
     format = options[:module] || Representable::Hash
@@ -101,6 +105,8 @@ MiniTest::Spec.class_eval do
       mod
     end
 
+    undef :inject_representer if method_defined? :inject_representer
+
     def inject_representer(mod, options)
       return unless options[:inject]
 
@@ -116,7 +122,7 @@ MiniTest::Spec.class_eval do
     def representer_for(modules=[Representable::Hash], &block)
       Module.new do
         extend TestMethods
-        include *modules
+        include(*modules)
         module_exec(&block)
       end
     end
@@ -127,9 +133,15 @@ MiniTest::Spec.class_eval do
 end
 
 class BaseTest < MiniTest::Spec
-  let (:new_album)  { OpenStruct.new.extend(representer) }
-  let (:album)      { OpenStruct.new(:songs => ["Fuck Armageddon"]).extend(representer) }
-  let (:song) { OpenStruct.new(:title => "Resist Stance") }
-  let (:song_representer) { Module.new do include Representable::Hash; property :title end  }
+  let(:new_album)  { OpenStruct.new.extend(representer) }
+  let(:album)      { OpenStruct.new(:songs => ["Fuck Armageddon"]).extend(representer) }
+  let(:song) { OpenStruct.new(:title => "Resist Stance") }
+  let(:song_representer) { Module.new do include Representable::Hash; property :title end  }
 
+end
+
+Band = Struct.new(:id, :name) do
+  def [](*attrs)
+    attrs.collect { |attr| send(attr) }
+  end
 end

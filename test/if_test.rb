@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class IfTest < MiniTest::Spec
-  let (:band_class) { Class.new do
+  let(:band_class) { Class.new do
     include Representable::Hash
     attr_accessor :fame
     self
@@ -18,14 +18,14 @@ class IfTest < MiniTest::Spec
     band_class.class_eval { property :fame, :if => lambda { |*| false } }
     band = band_class.new
     band.from_hash({"fame"=>"oh yes"})
-    assert_equal nil, band.fame
+    assert_nil band.fame
   end
 
   it "ignores property when :exclude'ed even when condition is true" do
     band_class.class_eval { property :fame, :if => lambda { |*| true } }
     band = band_class.new
     band.from_hash({"fame"=>"oh yes"}, {:exclude => [:fame]})
-    assert_equal nil, band.fame
+    assert_nil band.fame
   end
 
   it "executes block in instance context" do
@@ -44,20 +44,20 @@ class IfTest < MiniTest::Spec
     subject { OpenStruct.new(:signed_contract => false, :label => "Fat") }
 
     it "skips when false" do
-      subject.extend(representer).to_hash.must_equal({})
+      _(subject.extend(representer).to_hash).must_equal({})
     end
 
     it "represents when true" do
       subject.signed_contract= true
-      subject.extend(representer).to_hash.must_equal({"label"=>"Fat"})
+      _(subject.extend(representer).to_hash).must_equal({"label"=>"Fat"})
     end
 
     it "works with decorator" do
       rpr = representer
-      Class.new(Representable::Decorator) do
+      _(Class.new(Representable::Decorator) do
         include Representable::Hash
         include rpr
-      end.new(subject).to_hash.must_equal({})
+      end.new(subject).to_hash).must_equal({})
     end
   end
 
@@ -69,11 +69,11 @@ class IfTest < MiniTest::Spec
     subject { OpenStruct.new(:name => "Outbound").extend(representer) }
 
     it "works without specifying options" do
-      subject.to_hash.must_equal({})
+      _(subject.to_hash).must_equal({})
     end
 
     it "passes user options to block" do
-      subject.to_hash(user_options: { include_name: true }).must_equal({"name" => "Outbound"})
+      _(subject.to_hash(user_options: { include_name: true })).must_equal({"name" => "Outbound"})
     end
   end
 end

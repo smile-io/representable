@@ -20,8 +20,8 @@ class ClassTest < BaseTest
 
     it "creates fresh instance and doesn't extend" do
       song = representer.prepare(OpenStruct.new).from_hash({"song" => {"__name__" => "Captured"}}).song
-      song.must_be_instance_of RepresentingSong
-      song.name.must_equal "Captured"
+      _(song).must_be_instance_of RepresentingSong
+      _(song.name).must_equal "Captured"
     end
   end
 
@@ -33,8 +33,8 @@ class ClassTest < BaseTest
 
     it "creates fresh instance and doesn't extend" do
       song = representer.prepare(OpenStruct.new).from_hash({"song" => {"__name__" => "Captured"}}).song
-      song.must_be_instance_of RepresentingSong
-      song.name.must_equal "Captured"
+      _(song).must_be_instance_of RepresentingSong
+      _(song.name).must_equal "Captured"
     end
   end
 
@@ -54,7 +54,7 @@ class ClassTest < BaseTest
 
 
   describe "lambda receiving fragment and args" do
-    let (:klass) { Class.new do
+    let(:klass) { Class.new do
       class << self
         attr_accessor :args
       end
@@ -69,13 +69,13 @@ class ClassTest < BaseTest
       property :song, :class => lambda { |options| _klass.args=([options[:fragment],options[:user_options]]); _klass }
     end
 
-    it { representer.prepare(OpenStruct.new).from_hash({"song" => {"name" => "Captured"}}, user_options: {volume: true}).song.class.args.
+    it { _(representer.prepare(OpenStruct.new).from_hash({"song" => {"name" => "Captured"}}, user_options: {volume: true}).song.class.args).
       must_equal([{"name"=>"Captured"}, {:volume=>true}]) }
   end
 
 
   describe "collection: lambda receiving fragment and args" do
-    let (:klass) { Class.new do
+    let(:klass) { Class.new do
       class << self
         attr_accessor :args
       end
@@ -90,7 +90,7 @@ class ClassTest < BaseTest
       collection :songs, :class => lambda { |options| _klass.args=([options[:fragment],options[:index],options[:user_options]]); _klass }
     end
 
-    it { representer.prepare(OpenStruct.new).from_hash({"songs" => [{"name" => "Captured"}]}, user_options: {volume: true}).songs.first.class.args.
+    it { _(representer.prepare(OpenStruct.new).from_hash({"songs" => [{"name" => "Captured"}]}, user_options: {volume: true}).songs.first.class.args).
       must_equal([{"name"=>"Captured"}, 0, {:volume=>true}]) }
   end
 
@@ -109,7 +109,7 @@ class ClassTest < BaseTest
     end
 
     it "allows returning arbitrary objects in #from_hash" do
-      representer.prepare(OpenStruct.new).from_hash({"song" => 1}).song.must_equal [1,2,3,4]
+      _(representer.prepare(OpenStruct.new).from_hash({"song" => 1}).song).must_equal [1,2,3,4]
     end
   end
 end

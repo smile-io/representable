@@ -1,16 +1,21 @@
-require "virtus"
+require "dry-types"
 
 module Representable
   module Coercion
+    module Types
+      if Gem::Version.new(Dry::Types::VERSION) <= Gem::Version.new('0.14.1')
+        include Dry::Types.module
+      else
+        include Dry::Types()
+      end
+    end
     class Coercer
       def initialize(type)
         @type = type
       end
 
-      # This gets called when the :render_filter or :parse_filter option is evaluated.
-      # Usually the Coercer instance is an element in a Pipeline to allow >1 filters per property.
-      def call(input, options)
-        Virtus::Attribute.build(@type).coerce(input)
+      def call(input, _options)
+        @type.call(input)
       end
     end
 

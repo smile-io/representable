@@ -12,7 +12,7 @@ class LonelyRepresenterTest < MiniTest::Spec
   ) do |format, mod, output, input|
 
     describe "[#{format}] lonely collection, render-only" do # TODO: introduce :representable option?
-      let (:format) { format }
+      let(:format) { format }
 
       representer!(module: mod) do
         items do
@@ -20,7 +20,7 @@ class LonelyRepresenterTest < MiniTest::Spec
         end
       end
 
-      let (:album) { [Song.new("Resist Stance"), Song.new("Suffer")].extend(representer) }
+      let(:album) { [Song.new("Resist Stance"), Song.new("Suffer")].extend(representer) }
 
       it "calls #to_hash on song instances, nothing else" do
         render(album).must_equal_document(output)
@@ -36,14 +36,14 @@ class LonelyRepresenterTest < MiniTest::Spec
     property :name
   end
 
-  let (:decorator) { rpr = representer; Class.new(Representable::Decorator) { include Representable::Hash; include rpr } }
+  let(:decorator) { rpr = representer; Class.new(Representable::Decorator) { include Representable::Hash; include rpr } }
 
   describe "JSON::Collection" do
-    let (:songs) { [Song.new("Days Go By"), Song.new("Can't Take Them All")] }
-    let (:json)  { "[{\"name\":\"Days Go By\"},{\"name\":\"Can't Take Them All\"}]" }
+    let(:songs) { [Song.new("Days Go By"), Song.new("Can't Take Them All")] }
+    let(:json)  { "[{\"name\":\"Days Go By\"},{\"name\":\"Can't Take Them All\"}]" }
 
     describe "with contained objects" do
-      let (:representer) {
+      let(:representer) {
         Module.new do
           include Representable::JSON::Collection
           items :class => Song, :extend => SongRepresenter
@@ -60,11 +60,11 @@ class LonelyRepresenterTest < MiniTest::Spec
       end
 
       it "parses array" do
-        [].extend(representer).from_json(json).must_equal songs
+        _([].extend(representer).from_json(json)).must_equal songs
       end
 
       it "parses array with decorator" do
-        decorator.new([]).from_json(json).must_equal songs
+        _(decorator.new([]).from_json(json)).must_equal songs
       end
     end
 
@@ -75,25 +75,25 @@ class LonelyRepresenterTest < MiniTest::Spec
         end
       end
 
-      it { songs.extend(representer).to_json.must_equal json }
-      it { [].extend(representer).from_json(json).must_equal songs }
+      it { _(songs.extend(representer).to_json).must_equal json }
+      it { _([].extend(representer).from_json(json)).must_equal songs }
     end
 
     describe "with contained text" do
-      let (:representer) {
+      let(:representer) {
         Module.new do
           include Representable::JSON::Collection
         end
       }
-      let (:songs) { ["Days Go By", "Can't Take Them All"] }
-      let (:json)  { "[\"Days Go By\",\"Can't Take Them All\"]" }
+      let(:songs) { ["Days Go By", "Can't Take Them All"] }
+      let(:json)  { "[\"Days Go By\",\"Can't Take Them All\"]" }
 
       it "renders contained items #to_json" do
         assert_json json, songs.extend(representer).to_json
       end
 
       it "returns objects array from #from_json" do
-        [].extend(representer).from_json(json).must_equal songs
+        _([].extend(representer).from_json(json)).must_equal songs
       end
     end
   end
@@ -112,28 +112,28 @@ class LonelyRepresenterTest < MiniTest::Spec
     end
 
 
-    it { [1,2].extend(representer).to_hash(user_options: {one: One, two: Two}).must_equal(["One: 1", "Two: 2"]) }
+    it { _([1,2].extend(representer).to_hash(user_options: {one: One, two: Two})).must_equal(["One: 1", "Two: 2"]) }
   end
 
 
   describe "JSON::Hash" do  # TODO: move to HashTest.
     describe "with contained objects" do
-      let (:representer) {
+      let(:representer) {
         Module.new do
           include Representable::JSON::Hash
           values :class => Song, :extend => SongRepresenter
         end
       }
-      let (:json)  { "{\"one\":{\"name\":\"Days Go By\"},\"two\":{\"name\":\"Can't Take Them All\"}}" }
-      let (:songs) { {"one" => Song.new("Days Go By"), "two" => Song.new("Can't Take Them All")} }
+      let(:json)  { "{\"one\":{\"name\":\"Days Go By\"},\"two\":{\"name\":\"Can't Take Them All\"}}" }
+      let(:songs) { {"one" => Song.new("Days Go By"), "two" => Song.new("Can't Take Them All")} }
 
       describe "#to_json" do
         it "renders hash" do
-          songs.extend(representer).to_json.must_equal json
+          _(songs.extend(representer).to_json).must_equal json
         end
 
         it "renders hash with decorator" do
-          decorator.new(songs).to_json.must_equal json
+          _(decorator.new(songs).to_json).must_equal json
         end
 
         it "respects :exclude" do
@@ -147,11 +147,11 @@ class LonelyRepresenterTest < MiniTest::Spec
 
       describe "#from_json" do
         it "returns objects array" do
-          {}.extend(representer).from_json(json).must_equal songs
+          _({}.extend(representer).from_json(json)).must_equal songs
         end
 
         it "parses hash with decorator" do
-          decorator.new({}).from_json(json).must_equal songs
+          _(decorator.new({}).from_json(json)).must_equal songs
         end
 
         it "respects :exclude" do
@@ -171,23 +171,23 @@ class LonelyRepresenterTest < MiniTest::Spec
           end
         end
 
-        it { songs.extend(representer).to_json.must_equal json }
-        it { {}.extend(representer).from_json(json).must_equal songs }
+        it { _(songs.extend(representer).to_json).must_equal json }
+        it { _({}.extend(representer).from_json(json)).must_equal songs }
       end
     end
 
 
     describe "with scalar" do
-      let (:representer) {
+      let(:representer) {
         Module.new do
           include Representable::JSON::Hash
         end
       }
-      let (:json)  { %{{"one":1,"two":2}} }
-      let (:data) { {one: 2, two: 3} }
+      let(:json)  { %{{"one":1,"two":2}} }
+      let(:data) { {one: 2, two: 3} }
 
       describe "#to_json" do
-        it { data.extend(representer).to_json.must_equal %{{"one":2,"two":3}} }
+        it { _(data.extend(representer).to_json).must_equal %{{"one":2,"two":3}} }
 
         # it "respects :exclude" do
         #   assert_json "{\"two\":{\"name\":\"Can't Take Them All\"}}", {:one => Song.new("Days Go By"), :two => Song.new("Can't Take Them All")}.extend(representer).to_json(:exclude => [:one])
@@ -199,7 +199,7 @@ class LonelyRepresenterTest < MiniTest::Spec
       end
 
       describe "#from_json" do # FIXME: what's the point of this?
-        it { data.extend(representer).from_hash(data).must_equal data }
+        it { _(data.extend(representer).from_hash(data)).must_equal data }
       end
     end
 
@@ -234,6 +234,6 @@ class CollectionWithIncludeTest < MiniTest::Spec
     end
   end
 
-  it { representer.new([Song.new(1, "ACAB")]).to_hash.must_equal([{"id"=>1, "title"=>"ACAB"}]) }
-  it { representer.new([Song.new(1, "ACAB")]).to_hash(include: [:title]).must_equal([{"title"=>"ACAB"}]) }
+  it { _(representer.new([Song.new(1, "ACAB")]).to_hash).must_equal([{"id"=>1, "title"=>"ACAB"}]) }
+  it { _(representer.new([Song.new(1, "ACAB")]).to_hash(include: [:title])).must_equal([{"title"=>"ACAB"}]) }
 end

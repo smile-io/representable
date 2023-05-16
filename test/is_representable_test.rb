@@ -9,9 +9,9 @@ class IsRepresentableTest < BaseTest
     end
 
     it "does extend but doesn't call #to_hash" do
-      Struct.new(:song).new(song = Object.new).extend(representer).
-        to_hash.must_equal("song" => song)
-      song.must_be_kind_of Representable::Hash
+      _(Struct.new(:song).new(song = Object.new).extend(representer).
+        to_hash).must_equal("song" => song)
+      _(song).must_be_kind_of Representable::Hash
     end
   end
 
@@ -30,9 +30,9 @@ class IsRepresentableTest < BaseTest
         end
       end
 
-      Struct.new(:song).new(song).extend(representer).
-        to_hash.must_equal("song" => 1)
-      song.wont_be_kind_of Representable::Hash
+      _(Struct.new(:song).new(song).extend(representer).
+        to_hash).must_equal("song" => 1)
+      _(song).wont_be_kind_of Representable::Hash
     end
   end
 
@@ -48,8 +48,8 @@ class IsRepresentableTest < BaseTest
       hit = Struct.new(:song).new.extend(representer).
         from_hash("song" => 1)
 
-      hit.song.must_equal OpenStruct.new
-      hit.song.must_be_kind_of Representable::Hash
+      _(hit.song).must_equal OpenStruct.new
+      _(hit.song).must_be_kind_of Representable::Hash
     end
   end
 
@@ -70,8 +70,8 @@ class IsRepresentableTest < BaseTest
       hit = Struct.new(:song).new.extend(representer).
         from_hash("song" => "Sonata No.2")
 
-      hit.song.must_equal "Piano?"
-      hit.song.wont_be_kind_of Representable::Hash
+      _(hit.song).must_equal "Piano?"
+      _(hit.song).wont_be_kind_of Representable::Hash
     end
   end
 end

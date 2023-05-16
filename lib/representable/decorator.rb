@@ -1,5 +1,5 @@
-require "representable"
 require "uber/inheritable_attr"
+require "representable"
 
 module Representable
   class Decorator

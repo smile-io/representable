@@ -5,6 +5,7 @@ module Representable
     class Binding < Representable::Hash::Binding
       def self.build_for(definition)
         return Collection.new(definition) if definition.array?
+
         new(definition)
       end
 

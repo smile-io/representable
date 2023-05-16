@@ -1,15 +1,13 @@
-require "representable/hash"
-require "representable/json/collection"
+gem "multi_json", '>= 1.14.1'
+require "multi_json"
 
-begin
-  require "multi_json"
-rescue LoadError => _
-  abort "Missing dependency 'multi_json' for Representable::JSON. See dependencies section in README.md for details."
-end
+require "representable"
 
 module Representable
   # Brings #to_json and #from_json to your object.
   module JSON
+    autoload :Collection, "representable/json/collection"
+
     extend Hash::ClassMethods
     include Hash
 
@@ -43,5 +41,8 @@ module Representable
     def to_json(*args)
       MultiJson.dump to_hash(*args)
     end
+
+    alias_method :render, :to_json
+    alias_method :parse, :from_json
   end
 end

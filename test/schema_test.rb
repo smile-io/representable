@@ -58,13 +58,13 @@ class SchemaTest < MiniTest::Spec
   end
 
   describe "3-level deep with features" do
-    let (:label) { OpenStruct.new(:name => "Epitaph", :location => OpenStruct.new(:city => "Sanfran", :name => "DON'T SHOW ME!")) }
+    let(:label) { OpenStruct.new(:name => "Epitaph", :location => OpenStruct.new(:city => "Sanfran", :name => "DON'T SHOW ME!")) }
 
     # Module does correctly include features in inlines.
-    it { band.extend(Module).to_hash.must_equal({"label"=>{"name"=>"Epitaph", "location"=>{"city"=>"Sanfran"}}, "genre"=>"Punkrock"}) }
+    it { _(band.extend(Module).to_hash).must_equal({"label"=>{"name"=>"Epitaph", "location"=>{"city"=>"Sanfran"}}, "genre"=>"Punkrock"}) }
 
     # Decorator does correctly include features in inlines.
-    it { Decorator.new(band).to_hash.must_equal({"label"=>{"name"=>"Epitaph", "location"=>{"city"=>"Sanfran"}}, "genre"=>"Punkrock"}) }
+    it { _(Decorator.new(band).to_hash).must_equal({"label"=>{"name"=>"Epitaph", "location"=>{"city"=>"Sanfran"}}, "genre"=>"Punkrock"}) }
   end
 
 
@@ -77,14 +77,14 @@ class SchemaTest < MiniTest::Spec
 
   # puts Decorator.representable_attrs[:definitions].inspect
 
-  let (:label) { OpenStruct.new(:name => "Fat Wreck", :city => "San Francisco", :employees => [OpenStruct.new(:name => "Mike")], :location => OpenStruct.new(:city => "Sanfran")) }
-  let (:band) { OpenStruct.new(:genre => "Punkrock", :label => label) }
+  let(:label) { OpenStruct.new(:name => "Fat Wreck", :city => "San Francisco", :employees => [OpenStruct.new(:name => "Mike")], :location => OpenStruct.new(:city => "Sanfran")) }
+  let(:band) { OpenStruct.new(:genre => "Punkrock", :label => label) }
 
 
   # it { FlatlinersDecorator.new( OpenStruct.new(label: OpenStruct.new) ).
   #   to_hash.must_equal({}) }
   it do
-    Decorator.new(band).to_hash.must_equal({"genre"=>"Punkrock", "label"=>{"name"=>"Fat Wreck", "location"=>{"city"=>"Sanfran"}}})
+    _(Decorator.new(band).to_hash).must_equal({"genre"=>"Punkrock", "label"=>{"name"=>"Fat Wreck", "location"=>{"city"=>"Sanfran"}}})
   end
 
 
@@ -103,7 +103,7 @@ class SchemaTest < MiniTest::Spec
   end
 
   it do
-    InheritDecorator.new(band).to_hash.must_equal({"genre"=>"Punkrock", "label"=>{"name"=>"Fat Wreck", "city"=>"San Francisco", "location"=>{"city"=>"Sanfran"}}})
+    _(InheritDecorator.new(band).to_hash).must_equal({"genre"=>"Punkrock", "label"=>{"name"=>"Fat Wreck", "city"=>"San Francisco", "location"=>{"city"=>"Sanfran"}}})
   end
 
 
@@ -116,11 +116,8 @@ class SchemaTest < MiniTest::Spec
     end
   end
 
-  require "pp"
-  pp InheritFromDecorator.representable_attrs.get(:label)[:extend].(nil).representable_attrs
-
   it do
-    InheritFromDecorator.new(band).to_hash.must_equal({"genre"=>"Punkrock", "label"=>{"name"=>"Fat Wreck", "city"=>"San Francisco", "employees"=>[{"name"=>"Mike"}], "location"=>{"city"=>"Sanfran"}}})
+    _(InheritFromDecorator.new(band).to_hash).must_equal({"genre"=>"Punkrock", "label"=>{"name"=>"Fat Wreck", "city"=>"San Francisco", "employees"=>[{"name"=>"Mike"}], "location"=>{"city"=>"Sanfran"}}})
   end
 end
 

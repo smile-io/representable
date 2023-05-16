@@ -3,7 +3,7 @@ module Representable
     options[:binding].evaluate_option(:getter, input, options)
   end
 
-  GetValue = ->(input, options) { options[:binding].send(:exec_context, options).send(options[:binding].getter) }
+  GetValue = ->(_input, options) { options[:binding].send(:exec_context, options).public_send(options[:binding].getter) }
 
   Writer = ->(input, options) do
     options[:binding].evaluate_option(:writer, input, options)
@@ -37,6 +37,7 @@ module Representable
 
   Serialize = ->(input, options) do
     return if input.nil? # DISCUSS: how can we prevent that?
+
     binding, options = options[:binding], options[:options] # FIXME: rename to :local_options.
 
     options_for_nested = OptionsForNested.(options, binding)

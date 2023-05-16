@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 module Representable
   module Hash
     module AllowSymbols
-    private
+      private
+
       def filter_wrap_for(data, *args)
         super(Conversion.stringify_keys(data), *args)
       end
@@ -11,16 +14,11 @@ module Representable
       end
     end
 
-    class Conversion
-      # DISCUSS: we could think about mixin in IndifferentAccess here (either hashie or ActiveSupport).
-      # or decorating the hash.
+    module Conversion
       def self.stringify_keys(hash)
-        hash = hash.dup
-
-        hash.keys.each do |k|
-          hash[k.to_s] = hash.delete(k)
-        end
-        hash
+        hash.keys.collect do |key|
+          [ key.to_s, hash[key] ]
+        end.to_h
       end
     end
   end
