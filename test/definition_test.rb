@@ -6,42 +6,40 @@ class DefinitionTest < MiniTest::Spec
   # TODO: test that we DON'T clone options, that must happen in
   describe "#initialize" do
     it do
-      opts = nil
-
       # new yields the defaultized options HASH.
       definition = Definition.new(:song, :extend => Module) do |options|
         options[:awesome] = true
         options[:parse_filter] << 1
 
         # default variables
-        options[:as].must_equal nil
-        options[:extend].must_equal Module
+        _(options[:as]).must_be_nil
+        _(options[:extend]).must_equal Module
       end
-      definition.name.must_equal "song"
+      _(definition.name).must_equal "song"
 
       #
-      definition[:awesome].must_equal true
-      definition[:parse_filter].must_equal Representable::Pipeline[1]
-      definition[:render_filter].must_equal Representable::Pipeline[]
+      _(definition[:awesome]).must_equal true
+      _(definition[:parse_filter]).must_equal Representable::Pipeline[1]
+      _(definition[:render_filter]).must_equal Representable::Pipeline[]
     end
   end
 
   describe "#[]" do
-    let (:definition) { Definition.new(:song) }
+    let(:definition) { Definition.new(:song) }
     # default is nil.
-    it { definition[:bla].must_equal nil }
+    it { _(definition[:bla]).must_be_nil }
   end
 
   # merge!
   describe "#merge!" do
-    let (:definition) { Definition.new(:song, :whatever => true) }
+    let(:definition) { Definition.new(:song, :whatever => true) }
 
     # merges new options.
-    it { definition.merge!(:something => true)[:something].must_equal true }
+    it { _(definition.merge!(:something => true)[:something]).must_equal true }
     # doesn't override original options.
-    it { definition.merge!({:something => true})[:whatever].must_equal true }
+    it { _(definition.merge!({:something => true})[:whatever]).must_equal true }
     # override original when passed in #merge!.
-    it { definition.merge!({:whatever => false})[:whatever].must_equal false }
+    it { _(definition.merge!({:whatever => false})[:whatever]).must_equal false }
 
     # with block
     it do
@@ -54,47 +52,47 @@ class DefinitionTest < MiniTest::Spec
         # options[:extend].must_equal Module
       end
 
-      definition[:awesome].must_equal true
-      definition[:something].must_equal true
-      definition[:render_filter].must_equal Representable::Pipeline[1]
-      definition[:parse_filter].must_equal Representable::Pipeline[]
+      _(definition[:awesome]).must_equal true
+      _(definition[:something]).must_equal true
+      _(definition[:render_filter]).must_equal Representable::Pipeline[1]
+      _(definition[:parse_filter]).must_equal Representable::Pipeline[]
     end
 
     describe "with :parse_filter" do
-      let (:definition) { Definition.new(:title, :parse_filter => 1) }
+      let(:definition) { Definition.new(:title, :parse_filter => 1) }
 
       # merges :parse_filter and :render_filter.
       it do
         merged = definition.merge!(:parse_filter => 2)[:parse_filter]
 
-        merged.must_be_kind_of Representable::Pipeline
-        merged.size.must_equal 2
+        _(merged).must_be_kind_of Representable::Pipeline
+        _(merged.size).must_equal 2
       end
 
       # :parse_filter can also be array.
-      it { definition.merge!(:parse_filter => [2, 3])[:parse_filter].size.must_equal 3 }
+      it { _(definition.merge!(:parse_filter => [2, 3])[:parse_filter].size).must_equal 3 }
     end
 
     # does not change arguments
     it do
       Definition.new(:title).merge!(options = {:whatever => 1})
-      options.must_equal(:whatever => 1)
+      _(options).must_equal(:whatever => 1)
     end
   end
 
 
   # delete!
   describe "#delete!" do
-    let (:definition) { Definition.new(:song, serialize: "remove me!") }
+    let(:definition) { Definition.new(:song, serialize: "remove me!") }
 
-    before { definition[:serialize].evaluate(nil).must_equal "remove me!" }
+    before { _(definition[:serialize].(nil)).must_equal "remove me!" }
 
-    it { definition.delete!(:serialize)[:serialize].must_equal nil }
+    it { _(definition.delete!(:serialize)[:serialize]).must_be_nil }
   end
 
   # #inspect
   describe "#inspect" do
-    it { Definition.new(:songs).inspect.must_equal "#<Representable::Definition ==>songs @options={:name=>\"songs\", :parse_filter=>[], :render_filter=>[]}>" }
+    it { _(Definition.new(:songs).inspect).must_equal "#<Representable::Definition ==>songs @options={:name=>\"songs\", :parse_filter=>[], :render_filter=>[]}>" }
   end
 
 
@@ -104,13 +102,13 @@ class DefinitionTest < MiniTest::Spec
     end
 
     it "responds to #representer_module" do
-      assert_equal nil, Representable::Definition.new(:song).representer_module
+      assert_nil Representable::Definition.new(:song).representer_module
       assert_equal Hash, Representable::Definition.new(:song, :extend => Hash).representer_module
     end
 
     describe "#typed?" do
       it "is false per default" do
-        assert ! @def.typed?
+        refute @def.typed?
       end
 
       it "is true when :class is present" do
@@ -129,7 +127,7 @@ class DefinitionTest < MiniTest::Spec
 
     describe "#representable?" do
       it { assert Definition.new(:song, :representable => true).representable? }
-      it { Definition.new(:song, :representable => true, :extend => Object).representable?.must_equal true }
+      it { _(Definition.new(:song, :representable => true, :extend => Object).representable?).must_equal true }
       it { refute Definition.new(:song, :representable => false, :extend => Object).representable? }
       it { assert Definition.new(:song, :extend => Object).representable? }
       it { refute Definition.new(:song).representable? }
@@ -152,16 +150,16 @@ class DefinitionTest < MiniTest::Spec
       it do
         dfn = Representable::Definition.new(:songs, nested: Module)
         assert dfn.typed?
-        dfn[:extend].(nil).must_equal Module
+        _(dfn[:extend].(nil)).must_equal Module
       end
     end
 
 
     describe "#clone" do
-      subject { Representable::Definition.new(:title, :volume => 9, :clonable => Uber::Options::Value.new(1)) }
+      subject { Representable::Definition.new(:title, :volume => 9, :clonable => ::Representable::Option(1)) }
 
-      it { subject.clone.must_be_kind_of Representable::Definition }
-      it { subject.clone[:clonable].evaluate(nil).must_equal 1 }
+      it { _(subject.clone).must_be_kind_of Representable::Definition }
+      it { _(subject.clone[:clonable].(nil)).must_equal 1 }
 
       it "clones @options" do
         @def.merge!(:volume => 9)
@@ -177,11 +175,11 @@ class DefinitionTest < MiniTest::Spec
 
   describe "#has_default?" do
     it "returns false if no :default set" do
-      assert_equal false, Representable::Definition.new(:song).has_default?
+      refute Representable::Definition.new(:song).has_default?
     end
 
     it "returns true if :default set" do
-      assert_equal true, Representable::Definition.new(:song, :default => nil).has_default?
+      assert Representable::Definition.new(:song, :default => nil).has_default?
     end
   end
 
@@ -192,14 +190,14 @@ class DefinitionTest < MiniTest::Spec
     end
 
     it "returns false when :binding is not set" do
-      assert !Representable::Definition.new(:songs)[:binding]
+      refute Representable::Definition.new(:songs)[:binding]
     end
   end
 
   describe "#create_binding" do
     it "executes the block (without special context)" do
       definition = Representable::Definition.new(:title, :binding => lambda { |*args| @binding = Representable::Binding.new(*args) })
-      definition.create_binding.must_equal @binding
+      _(definition.create_binding).must_equal @binding
     end
   end
 
@@ -217,7 +215,7 @@ class DefinitionTest < MiniTest::Spec
   describe ":default => value" do
     it "responds to #default" do
       @def = Representable::Definition.new(:song)
-      assert_equal nil, @def[:default]
+      assert_nil @def[:default]
     end
 
     it "accepts a default value" do
@@ -233,7 +231,7 @@ class DefinitionTest < MiniTest::Spec
 
     it "responds to #hash?" do
       assert @def.hash?
-      assert ! Representable::Definition.new(:songs).hash?
+      refute Representable::Definition.new(:songs).hash?
     end
   end
 

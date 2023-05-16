@@ -17,11 +17,11 @@ describe "#from_hash" do
    end
 
    it "parses symbols, too" do
-     OpenStruct.new.extend(representer).from_hash({:song => {:title => "Der Optimist"}}).song.title.must_equal "Der Optimist"
+     _(OpenStruct.new.extend(representer).from_hash({:song => {:title => "Der Optimist"}}).song.title).must_equal "Der Optimist"
    end
 
    it "still parses strings" do
-     OpenStruct.new.extend(representer).from_hash({"song" => {"title" => "Der Optimist"}}).song.title.must_equal "Der Optimist"
+     _(OpenStruct.new.extend(representer).from_hash({"song" => {"title" => "Der Optimist"}}).song.title).must_equal "Der Optimist"
    end
 
    describe "with :wrap" do
@@ -33,7 +33,7 @@ describe "#from_hash" do
     end
 
      it "parses symbols, too" do
-       OpenStruct.new.extend(representer).from_hash({:album => {:song => {:title => "Der Optimist"}}}).song.title.must_equal "Der Optimist"
+       _(OpenStruct.new.extend(representer).from_hash({:album => {:song => {:title => "Der Optimist"}}}).song.title).must_equal "Der Optimist"
      end
    end
  end

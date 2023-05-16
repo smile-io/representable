@@ -1,3 +1,5 @@
+require 'representable/hash'
+
 module Representable::Hash
   module Collection
     include Representable::Hash
@@ -20,7 +22,7 @@ module Representable::Hash
     # TODO: revise lonely collection and build separate pipeline where we just use Serialize, etc.
 
     def create_representation_with(doc, options, format)
-      options = normalize_options(options)
+      options = normalize_options(**options)
       options[:_self] = options
 
       bin   = representable_bindings_for(format, options).first
@@ -30,7 +32,7 @@ module Representable::Hash
     end
 
     def update_properties_from(doc, options, format)
-      options = normalize_options(options)
+      options = normalize_options(**options)
       options[:_self] = options
 
       bin   = representable_bindings_for(format, options).first

@@ -7,8 +7,8 @@ class AsTest < MiniTest::Spec
     # :yaml => [Representable::YAML, "---\nsong:\n  name: Alive\n", "---\nsong:\n  name: You've Taken Everything\n"],
   ) do |format, mod, input, output|
 
-    let (:song) { representer.prepare(Song.new("Revolution")) }
-    let (:format) { format }
+    let(:song) { representer.prepare(Song.new("Revolution")) }
+    let(:format) { format }
 
 
     describe "as: with :symbol" do
@@ -17,7 +17,7 @@ class AsTest < MiniTest::Spec
       end
 
       it { render(song).must_equal_document output }
-      it { parse(song, input).name.must_equal "Wie Es Geht" }
+      it { _(parse(song, input).name).must_equal "Wie Es Geht" }
     end
 
 
@@ -27,7 +27,7 @@ class AsTest < MiniTest::Spec
       end
 
       it { render(song).must_equal_document({"Song" => "Revolution"}) }
-      it { parse(song, {"Song" => "Wie Es Geht"}).name.must_equal "Wie Es Geht" }
+      it { _(parse(song, {"Song" => "Wie Es Geht"}).name).must_equal "Wie Es Geht" }
     end
 
 
@@ -37,7 +37,7 @@ class AsTest < MiniTest::Spec
       end
 
       it { render(song, user_options:{volume: 1}).must_equal_document({"{:volume=>1}" => "Revolution"}) }
-      it { parse(song, {"{:volume=>1}" => "Wie Es Geht"}, user_options: {volume: 1}).name.must_equal "Wie Es Geht" }
+      it { _(parse(song, {"{:volume=>1}" => "Wie Es Geht"}, user_options: {volume: 1}).name).must_equal "Wie Es Geht" }
     end
   end
 end
@@ -60,6 +60,6 @@ class AsXmlTest < MiniTest::Spec
 
   it do
     skip
-    representer.new(Album.new(Band.new("Offspring"))).to_xml.must_equal ""
+    _(representer.new(Album.new(Band.new("Offspring"))).to_xml).must_equal ""
   end
 end

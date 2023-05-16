@@ -12,46 +12,59 @@ class DecoratorTest < MiniTest::Spec
     collection :songs, :class => Song, :extend => SongRepresentation
   end
 
-  let (:song) { Song.new("Mama, I'm Coming Home") }
-  let (:album) { Album.new([song]) }
+  class RatingRepresentation < Representable::Decorator
+    include Representable::JSON
+
+    property :system
+    property :value
+  end
+
+  let(:song) { Song.new("Mama, I'm Coming Home") }
+  let(:album) { Album.new([song]) }
+
+  let(:rating) { OpenStruct.new(system: 'MPAA', value: 'R') }
 
   describe "inheritance" do
-    let (:inherited_decorator) do
+    let(:inherited_decorator) do
       Class.new(AlbumRepresentation) do
         property :best_song
       end.new(Album.new([song], "Stand Up"))
     end
 
-    it { inherited_decorator.to_hash.must_equal({"songs"=>[{"name"=>"Mama, I'm Coming Home"}], "best_song"=>"Stand Up"}) }
+    it { _(inherited_decorator.to_hash).must_equal({"songs"=>[{"name"=>"Mama, I'm Coming Home"}], "best_song"=>"Stand Up"}) }
   end
 
-  let (:decorator) { AlbumRepresentation.new(album) }
+  let(:decorator) { AlbumRepresentation.new(album) }
+
+  let(:rating_decorator) { RatingRepresentation.new(rating) }
 
   it "renders" do
-    decorator.to_hash.must_equal({"songs"=>[{"name"=>"Mama, I'm Coming Home"}]})
-    album.wont_respond_to :to_hash
-    song.wont_respond_to :to_hash # DISCUSS: weak test, how to assert blank slate?
+    _(decorator.to_hash).must_equal({"songs"=>[{"name"=>"Mama, I'm Coming Home"}]})
+    _(album).wont_respond_to :to_hash
+    _(song).wont_respond_to :to_hash # DISCUSS: weak test, how to assert blank slate?
     # no @representable_attrs in decorated objects
-    song.instance_variable_get(:@representable_attrs).must_equal nil
+    _(song).wont_be(:instance_variable_defined?, :@representable_attrs)
+
+    _(rating_decorator.to_hash).must_equal({"system" => "MPAA", "value" => "R"})
   end
 
   describe "#from_hash" do
     it "returns represented" do
-      decorator.from_hash({"songs"=>[{"name"=>"Mama, I'm Coming Home"}]}).must_equal album
+      _(decorator.from_hash({"songs"=>[{"name"=>"Mama, I'm Coming Home"}]})).must_equal album
     end
 
     it "parses" do
       decorator.from_hash({"songs"=>[{"name"=>"Atomic Garden"}]})
-      album.songs.first.must_be_kind_of Song
-      album.songs.must_equal [Song.new("Atomic Garden")]
-      album.wont_respond_to :to_hash
-      song.wont_respond_to :to_hash # DISCUSS: weak test, how to assert blank slate?
+      _(album.songs.first).must_be_kind_of Song
+      _(album.songs).must_equal [Song.new("Atomic Garden")]
+      _(album).wont_respond_to :to_hash
+      _(song).wont_respond_to :to_hash # DISCUSS: weak test, how to assert blank slate?
     end
   end
 
   describe "#decorated" do
     it "is aliased to #represented" do
-      AlbumRepresentation.prepare(album).decorated.must_equal album
+      _(AlbumRepresentation.prepare(album).decorated).must_equal album
     end
   end
 
@@ -67,8 +80,8 @@ class DecoratorTest < MiniTest::Spec
       representer.new(album).from_hash({"songs"=>[{"name"=>"Atomic Garden"}]})
 
       # no @representable_attrs in decorated objects
-      song.instance_variable_get(:@representable_attrs).must_equal nil
-      album.instance_variable_get(:@representable_attrs).must_equal nil
+      _(song).wont_be(:instance_variable_defined?, :@representable_attrs)
+      _(album).wont_be(:instance_variable_defined?, :@representable_attrs)
     end
   end
 end
@@ -89,8 +102,8 @@ class InheritanceWithDecoratorTest < MiniTest::Spec
   end
 
   it do
-    Twin.representer_class.definitions.size.must_equal 0
-    Album.representer_class.definitions.size.must_equal 1
-    Song.representer_class.definitions.size.must_equal 0
+    _(Twin.representer_class.definitions.size).must_equal 0
+    _(Album.representer_class.definitions.size).must_equal 1
+    _(Song.representer_class.definitions.size).must_equal 0
   end
 end
