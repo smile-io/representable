@@ -20,23 +20,23 @@ class FeaturesTest < MiniTest::Spec
     end
   }
 
-  let (:song) { OpenStruct.new(:details => Object.new) }
+  let(:song) { OpenStruct.new(:details => Object.new) }
 
   describe "Module" do
     representer! do
-      instance_exec &definition
+      instance_exec(&definition)
     end
 
-    it { song.extend(representer).to_hash.must_equal({"title"=>"Is It A Lie", "length"=>"2:31", "details"=>{"title"=>"Is It A Lie"}}) }
+    it { _(song.extend(representer).to_hash).must_equal({"title"=>"Is It A Lie", "length"=>"2:31", "details"=>{"title"=>"Is It A Lie"}}) }
   end
 
 
   describe "Decorator" do
     representer!(:decorator => true) do
-      instance_exec &definition
+      instance_exec(&definition)
     end
 
-    it { representer.new(song).to_hash.must_equal({"title"=>"Is It A Lie", "length"=>"2:31", "details"=>{"title"=>"Is It A Lie"}}) }
+    it { _(representer.new(song).to_hash).must_equal({"title"=>"Is It A Lie", "length"=>"2:31", "details"=>{"title"=>"Is It A Lie"}}) }
   end
 end
 
@@ -65,6 +65,6 @@ class FeatureInclusionOrderTest < MiniTest::Spec
   end
 
   it do
-    representer.new(OpenStruct.new(song: Object)).to_hash.must_equal({"title"=>"I am number two, I was first!", "song"=>{"title"=>"I am number two, I was first!"}})
+    _(representer.new(OpenStruct.new(song: Object)).to_hash).must_equal({"title"=>"I am number two, I was first!", "song"=>{"title"=>"I am number two, I was first!"}})
   end
 end

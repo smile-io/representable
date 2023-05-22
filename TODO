@@ -1,8 +1,6 @@
 * Pass key/index as first block arg to :class and :extend
 class: |key, hsh|
 
-* Allow passing options to Binding#serialize.
-	serialize(.., options{:exclude => ..})
 
 document `XML::AttributeHash` etc
 

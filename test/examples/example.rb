@@ -17,7 +17,6 @@ end
 
 song = Song.new(:title => "Fallout", :track => 1)
 
-require 'representable/json'
 module SongRepresenter
   include Representable::JSON
 

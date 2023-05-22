@@ -22,12 +22,12 @@ class ParsePipelineTest < MiniTest::Spec
 
     it do
       representer.new(album = Album.new).from_hash("songs"=>nil)
-      album.songs.must_equal []
+      _(album.songs).must_equal []
     end
 
     it do
       representer.new(album = Album.new).from_hash("songs"=>[{"title" => "Business Conduct"}])
-      album.songs.must_equal [Song.new("Business Conduct")]
+      _(album.songs).must_equal [Song.new("Business Conduct")]
     end
   end
 
@@ -45,7 +45,6 @@ class ParsePipelineTest < MiniTest::Spec
     end
 
     def instance!(*options)
-      puts "@@@@@ #{options.inspect}"
       Song.new
     end
 
@@ -58,7 +57,6 @@ class ParsePipelineTest < MiniTest::Spec
     skip "TODO: implement :parse_pipeline and :render_pipeline, and before/after/replace semantics"
     album = Album.new
     Representer.new(album).from_hash({"artist"=>{"email"=>"yo"}, "songs"=>[{"title"=>"Affliction"}, {"title"=>"Dream Beater"}]})
-    album.songs.must_equal([Song.new("Affliction"), Song.new("Dream Beater")])
-    puts album.inspect
+    _(album.songs).must_equal([Song.new("Affliction"), Song.new("Dream Beater")])
   end
 end

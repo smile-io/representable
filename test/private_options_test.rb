@@ -8,11 +8,11 @@ class PrivateOptionsTest < MiniTest::Spec # TODO: move me to separate file.
 
   it "render: doesn't modify options" do
     representer.new(nil).to_hash(options)
-    options.must_equal({exclude: "name"})
+    _(options).must_equal({exclude: "name"})
   end
 
   it "parse: doesn't modify options" do
     representer.new(nil).from_hash(options)
-    options.must_equal({exclude: "name"})
+    _(options).must_equal({exclude: "name"})
   end
 end

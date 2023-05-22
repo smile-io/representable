@@ -11,11 +11,11 @@ module Representable
   ReadFragment = ->(input, options) { options[:binding].read(input, options[:as]) }
   Reader = ->(input, options) { options[:binding].evaluate_option(:reader, input, options) }
 
-  StopOnNotFound = ->(input, options) do
+  StopOnNotFound = ->(input, _options) do
     Binding::FragmentNotFound == input ? Pipeline::Stop : input
   end
 
-  StopOnNil = ->(input, options) do # DISCUSS: Not tested/used, yet.
+  StopOnNil = ->(input, _options) do # DISCUSS: Not tested/used, yet.
     input.nil? ? Pipeline::Stop : input
   end
 
@@ -96,13 +96,14 @@ module Representable
   If = ->(input, options) { options[:binding].evaluate_option(:if, nil, options) ? input : Pipeline::Stop }
 
   StopOnExcluded = ->(input, options) do
-    return input unless private = options[:options]
+    return input unless options[:options]
     return input unless props = (options[:options][:exclude] || options[:options][:include])
 
     res = props.include?(options[:binding].name.to_sym) # false with include: Stop. false with exclude: go!
 
     return input if options[:options][:include]&&res
     return input if options[:options][:exclude]&&!res
+
     Pipeline::Stop
   end
 end

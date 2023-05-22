@@ -9,8 +9,8 @@ class ConfigInheritTest < MiniTest::Spec
 
     child_def.merge!(:alias => property)
 
-    child_def[:alias].wont_equal parent_def[:alias]
-    child_def.object_id.wont_equal parent_def.object_id
+    _(child_def[:alias]).wont_equal parent_def[:alias]
+    _(child_def.object_id).wont_equal parent_def.object_id
   end
   # class Object
 
@@ -30,7 +30,7 @@ class ConfigInheritTest < MiniTest::Spec
     end
   end
 
-  it { Decorator.definitions.keys.must_equal ["title", "artist"] }
+  it { _(Decorator.definitions.keys).must_equal ["title", "artist"] }
 
   # in inheriting Decorator
 
@@ -38,10 +38,10 @@ class ConfigInheritTest < MiniTest::Spec
     property :location
   end
 
-  it { InheritingDecorator.definitions.keys.must_equal ["title", "artist", "location"] }
+  it { _(InheritingDecorator.definitions.keys).must_equal ["title", "artist", "location"] }
   it { assert_cloned(InheritingDecorator, Decorator, "title") }
   it do
-    InheritingDecorator.representable_attrs.get(:artist).representer_module.object_id.wont_equal Decorator.representable_attrs.get(:artist).representer_module.object_id
+    _(InheritingDecorator.representable_attrs.get(:artist).representer_module.object_id).wont_equal Decorator.representable_attrs.get(:artist).representer_module.object_id
   end
 
   # in inheriting and including Decorator
@@ -51,7 +51,7 @@ class ConfigInheritTest < MiniTest::Spec
     property :location
   end
 
-  it { InheritingAndIncludingDecorator.definitions.keys.must_equal ["title", "artist", "genre", "location"] }
+  it { _(InheritingAndIncludingDecorator.definitions.keys).must_equal ["title", "artist", "genre", "location"] }
   it { assert_cloned(InheritingAndIncludingDecorator, GenreModule, :genre) }
 
 
@@ -61,7 +61,7 @@ class ConfigInheritTest < MiniTest::Spec
     property :title
   end
 
-  it { Module.definitions.keys.must_equal ["title"] }
+  it { _(Module.definitions.keys).must_equal ["title"] }
 
 
   # in module including module
@@ -72,7 +72,7 @@ class ConfigInheritTest < MiniTest::Spec
     property :location
   end
 
-  it { SubModule.definitions.keys.must_equal ["title", "location"] }
+  it { _(SubModule.definitions.keys).must_equal ["title", "location"] }
   it { assert_cloned(SubModule, Module, :title) }
 
   # including preserves order
@@ -84,7 +84,7 @@ class ConfigInheritTest < MiniTest::Spec
     property :location
   end
 
-  it { IncludingModule.definitions.keys.must_equal ["genre", "title", "location"] }
+  it { _(IncludingModule.definitions.keys).must_equal ["genre", "title", "location"] }
 
 
   # included in class -------------------------------------------
@@ -93,7 +93,7 @@ class ConfigInheritTest < MiniTest::Spec
     include IncludingModule
   end
 
-  it { Class.definitions.keys.must_equal ["genre", "title", "location"] }
+  it { _(Class.definitions.keys).must_equal ["genre", "title", "location"] }
   it { assert_cloned(Class, IncludingModule, :title) }
   it { assert_cloned(Class, IncludingModule, :location) }
   it { assert_cloned(Class, IncludingModule, :genre) }
@@ -105,7 +105,7 @@ class ConfigInheritTest < MiniTest::Spec
     include IncludingModule
   end
 
-  it { DefiningClass.definitions.keys.must_equal ["street_cred", "genre", "title", "location"] }
+  it { _(DefiningClass.definitions.keys).must_equal ["street_cred", "genre", "title", "location"] }
 
   # in class
   class RepresenterClass
@@ -113,7 +113,7 @@ class ConfigInheritTest < MiniTest::Spec
     property :title
   end
 
-  it { RepresenterClass.definitions.keys.must_equal ["title"] }
+  it { _(RepresenterClass.definitions.keys).must_equal ["title"] }
 
 
   # in inheriting class
@@ -122,7 +122,7 @@ class ConfigInheritTest < MiniTest::Spec
     property :location
   end
 
-  it { InheritingClass.definitions.keys.must_equal ["title", "location"] }
+  it { _(InheritingClass.definitions.keys).must_equal ["title", "location"] }
   it { assert_cloned(InheritingClass, RepresenterClass, :title) }
 
   # in inheriting class and including
@@ -131,5 +131,5 @@ class ConfigInheritTest < MiniTest::Spec
     include GenreModule
   end
 
-  it { InheritingAndIncludingClass.definitions.keys.must_equal ["title", "location", "genre"] }
+  it { _(InheritingAndIncludingClass.definitions.keys).must_equal ["title", "location", "genre"] }
 end

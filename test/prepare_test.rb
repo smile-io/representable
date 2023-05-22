@@ -24,11 +24,11 @@ class PrepareTest < BaseTest
         :representable => false # don't call #to_hash.
     end
 
-    let (:hit) { Struct.new(:song).new(song).extend(representer) }
+    let(:hit) { Struct.new(:song).new(song).extend(representer) }
 
     it "calls prepare:, nothing else" do
       # render(hit).must_equal_document(output)
-      hit.to_hash.must_equal({"song" => PreparerClass.new(song)})
+      _(hit.to_hash).must_equal({"song" => PreparerClass.new(song)})
     end
 
 
@@ -54,13 +54,13 @@ class PrepareTest < BaseTest
         :representable => false # don't call #to_hash.
     end
 
-    let (:hit) { Struct.new(:song).new.extend(representer) }
+    let(:hit) { Struct.new(:song).new.extend(representer) }
 
     it "calls prepare:, nothing else" do
       # render(hit).must_equal_document(output)
       hit.from_hash("song" => {})
 
-      hit.song.must_equal(PreparerClass.new(String.new))
+      _(hit.song).must_equal(PreparerClass.new(String.new))
     end
   end
 end

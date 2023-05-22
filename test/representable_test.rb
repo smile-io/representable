@@ -76,8 +76,6 @@ class RepresentableTest < MiniTest::Spec
     end
 
     it "allows mixing in multiple representers" do
-      require 'representable/json'
-      require 'representable/xml'
       class Bodyjar
         include Representable::XML
         include Representable::JSON
@@ -134,8 +132,8 @@ class RepresentableTest < MiniTest::Spec
 
     # test ::inherited.
     it do
-      BaseClass.respond_to?(:other).must_equal false
-      SubClass.respond_to?(:other).must_equal true
+      _(BaseClass.respond_to?(:other)).must_equal false
+      _(SubClass.respond_to?(:other)).must_equal true
     end
 
     module DifferentIncluded
@@ -166,13 +164,13 @@ class RepresentableTest < MiniTest::Spec
     it "doesn't modify options hash" do
       options = {}
       representer.property(:title, options)
-      options.must_equal({})
+      _(options).must_equal({})
     end
 
     representer! {}
 
     it "returns the Definition instance" do
-      representer.property(:name).must_be_kind_of Representable::Definition
+      _(representer.property(:name)).must_be_kind_of Representable::Definition
     end
   end
 
@@ -226,7 +224,7 @@ class RepresentableTest < MiniTest::Spec
       @band = Class.new(Band) { property :name; collection :founders, :writeable => false; attr_accessor :founders }.new
       @band.from_hash("name" => "Iron Maiden", "groupies" => 2, "founders" => ["Steve Harris"])
       assert_equal "Iron Maiden", @band.name
-      assert_equal nil, @band.founders
+      assert_nil @band.founders
     end
 
     it "always returns the represented" do
@@ -235,7 +233,7 @@ class RepresentableTest < MiniTest::Spec
 
     it "includes false attributes" do
       @band.from_hash({"groupies"=>false})
-      assert_equal false, @band.groupies
+      refute @band.groupies
     end
 
     it "ignores properties not present in the incoming document" do
@@ -263,7 +261,7 @@ class RepresentableTest < MiniTest::Spec
 
         @band = Band.new.extend(repr)
         @band.send(config.first, config.last)
-        assert_equal nil, @band.name, "Failed in #{format}"
+        assert_nil @band.name, "Failed in #{format}"
       end
     end
 
@@ -302,14 +300,14 @@ class RepresentableTest < MiniTest::Spec
       end
 
       it "#to_hash propagates to nested objects" do
-        OpenStruct.new(track: OpenStruct.new(nr: 1, length: OpenStruct.new(seconds: nil))).extend(representer).extend(Representable::Debug).
-          to_hash(user_options: {nr: 9}).must_equal({"track"=>{"nr"=>9, "length"=>{seconds: 9}}})
+        _(OpenStruct.new(track: OpenStruct.new(nr: 1, length: OpenStruct.new(seconds: nil))).extend(representer).extend(Representable::Debug).
+          to_hash(user_options: {nr: 9})).must_equal({"track"=>{"nr"=>9, "length"=>{seconds: 9}}})
       end
 
       it "#from_hash propagates to nested objects" do
         song = OpenStruct.new.extend(representer).from_hash({"track"=>{"nr" => "replace me", "length"=>{"seconds"=>"replacing"}}}, user_options: {nr: 9})
-        song.track.nr.must_equal 9
-        song.track.length.seconds.must_equal 9
+        _(song.track.nr).must_equal 9
+        _(song.track.length.seconds).must_equal 9
       end
     end
   end
@@ -366,12 +364,12 @@ class RepresentableTest < MiniTest::Spec
       end
 
       it "executes lambda in represented instance context" do
-        Song.new("Carnage").instance_eval do
+        _(Song.new("Carnage").instance_eval do
           def compute_representer(name)
             UpcaseRepresenter
           end
           self
-        end.extend(representer).to_hash.must_equal({"name" => "CARNAGE"})
+        end.extend(representer).to_hash).must_equal({"name" => "CARNAGE"})
       end
     end
 
@@ -384,8 +382,8 @@ class RepresentableTest < MiniTest::Spec
 
       it "uses object from :instance but still extends it" do
         song = Song.new.extend(representer).from_hash("name" => "Eric's Had A Bad Day")
-        song.name.must_equal obj
-        song.name.must_be_kind_of mod
+        _(song.name).must_equal obj
+        _(song.name).must_be_kind_of mod
       end
     end
 
@@ -400,8 +398,8 @@ class RepresentableTest < MiniTest::Spec
       end
 
       it "uses lambda when parsing" do
-        Song.new.extend(representer).from_hash({"name" => "You Make Me Thick"}).name.must_equal "you make me thick"
-        Song.new.extend(representer).from_hash({"name" => "Stepstranger"}).name.must_equal "stepstranger" # DISCUSS: we compare "".is_a?(UpcaseString)
+        _(Song.new.extend(representer).from_hash({"name" => "You Make Me Thick"}).name).must_equal "you make me thick"
+        _(Song.new.extend(representer).from_hash({"name" => "Stepstranger"}).name).must_equal "stepstranger" # DISCUSS: we compare "".is_a?(UpcaseString)
       end
 
       describe "with :class lambda" do
@@ -412,12 +410,12 @@ class RepresentableTest < MiniTest::Spec
 
         it "creates instance from :class lambda when parsing" do
           song = OpenStruct.new.extend(representer).from_hash({"name" => "Quitters Never Win"})
-          song.name.must_be_kind_of UpcaseString
-          song.name.must_equal "QUITTERS NEVER WIN"
+          _(song.name).must_be_kind_of UpcaseString
+          _(song.name).must_equal "QUITTERS NEVER WIN"
 
           song = OpenStruct.new.extend(representer).from_hash({"name" => "Still Failing?"})
-          song.name.must_be_kind_of String
-          song.name.must_equal "still failing?"
+          _(song.name).must_be_kind_of String
+          _(song.name).must_equal "still failing?"
         end
       end
     end
@@ -429,12 +427,12 @@ class RepresentableTest < MiniTest::Spec
       end
 
       it "uses lambda for each item when rendering" do
-        Album.new([UpcaseString.new("Dean Martin"), "Charlie Still Smirks"]).extend(representer).to_hash.must_equal("songs"=>["DEAN MARTIN", "charlie still smirks"])
+        _(Album.new([UpcaseString.new("Dean Martin"), "Charlie Still Smirks"]).extend(representer).to_hash).must_equal("songs"=>["DEAN MARTIN", "charlie still smirks"])
       end
 
       it "uses lambda for each item when parsing" do
         album = Album.new.extend(representer).from_hash("songs"=>["DEAN MARTIN", "charlie still smirks"])
-        album.songs.must_equal ["dean martin", "charlie still smirks"] # DISCUSS: we compare "".is_a?(UpcaseString)
+        _(album.songs).must_equal ["dean martin", "charlie still smirks"] # DISCUSS: we compare "".is_a?(UpcaseString)
       end
 
       describe "with :class lambda" do
@@ -445,18 +443,18 @@ class RepresentableTest < MiniTest::Spec
 
         it "creates instance from :class lambda for each item when parsing" do
           album = Album.new.extend(representer).from_hash("songs"=>["Still Failing?", "charlie still smirks"])
-          album.songs.must_equal ["still failing?", "CHARLIE STILL SMIRKS"]
+          _(album.songs).must_equal ["still failing?", "CHARLIE STILL SMIRKS"]
         end
       end
     end
 
     describe ":decorator" do
-      let (:extend_rpr) { Module.new { include Representable::Hash; collection :songs, :extend => SongRepresenter } }
-      let (:decorator_rpr) { Module.new { include Representable::Hash; collection :songs, :decorator => SongRepresenter } }
-      let (:songs) { [Song.new("Bloody Mary")] }
+      let(:extend_rpr) { Module.new { include Representable::Hash; collection :songs, :extend => SongRepresenter } }
+      let(:decorator_rpr) { Module.new { include Representable::Hash; collection :songs, :decorator => SongRepresenter } }
+      let(:songs) { [Song.new("Bloody Mary")] }
 
       it "is aliased to :extend" do
-        Album.new(songs).extend(extend_rpr).to_hash.must_equal Album.new(songs).extend(decorator_rpr).to_hash
+        _(Album.new(songs).extend(extend_rpr).to_hash).must_equal Album.new(songs).extend(decorator_rpr).to_hash
       end
     end
 
@@ -472,22 +470,22 @@ class RepresentableTest < MiniTest::Spec
     end
 
     describe "::prepare" do
-      let (:song) { Song.new("Still Friends In The End") }
-      let (:album) { Album.new([song]) }
+      let(:song) { Song.new("Still Friends In The End") }
+      let(:album) { Album.new([song]) }
 
       describe "module including Representable" do
         it "uses :extend strategy" do
           album_rpr = Module.new { include Representable::Hash; collection :songs, :class => Song, :extend => SongRepresenter}
 
-          album_rpr.prepare(album).to_hash.must_equal({"songs"=>[{"name"=>"Still Friends In The End"}]})
-          album.must_respond_to :to_hash
+          _(album_rpr.prepare(album).to_hash).must_equal({"songs"=>[{"name"=>"Still Friends In The End"}]})
+          _(album).must_respond_to :to_hash
         end
       end
 
       describe "Decorator subclass" do
         it "uses :decorate strategy" do
-          AlbumRepresentation.prepare(album).to_hash.must_equal({"songs"=>[{"name"=>"Still Friends In The End"}]})
-          album.wont_respond_to :to_hash
+          _(AlbumRepresentation.prepare(album).to_hash).must_equal({"songs"=>[{"name"=>"Still Friends In The End"}]})
+          _(album).wont_respond_to :to_hash
         end
       end
     end

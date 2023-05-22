@@ -15,12 +15,12 @@ class StopWhenIncomingObjectFragmentIsNilTest < MiniTest::Spec
 
   it do
     album = Album.new
-    representer.new(album).from_hash({"id"=>1, "songs"=>[{"title"=>"Walkie Talkie"}]}).songs.must_equal [Song.new("Walkie Talkie")]
+    _(representer.new(album).from_hash({"id"=>1, "songs"=>[{"title"=>"Walkie Talkie"}]}).songs).must_equal [Song.new("Walkie Talkie")]
   end
 
   it do
     album = Album.new(2, ["original"])
-    representer.new(album).from_hash({"id"=>1, "songs"=>nil}).songs.must_equal ["original"]
+    _(representer.new(album).from_hash({"id"=>1, "songs"=>nil}).songs).must_equal ["original"]
   end
 
 end
@@ -35,13 +35,13 @@ class RenderPipelineOptionTest < MiniTest::Spec
     end
   end
 
-  it { representer.new(Album.new).to_hash(user_options: {function: NilToNA}).must_equal({"id"=>"n/a"}) }
-  it { representer.new(Album.new(1)).to_hash(user_options: {function: NilToNA}).must_equal({"id"=>1}) }
+  it { _(representer.new(Album.new).to_hash(user_options: {function: NilToNA})).must_equal({"id"=>"n/a"}) }
+  it { _(representer.new(Album.new(1)).to_hash(user_options: {function: NilToNA})).must_equal({"id"=>1}) }
 
   it "is cached" do
     decorator = representer.new(Album.new)
-    decorator.to_hash(user_options: {function: NilToNA}).must_equal({"id"=>"n/a"})
-    decorator.to_hash(user_options: {function: nil}).must_equal({"id"=>"n/a"}) # non-sense function is not applied.
+    _(decorator.to_hash(user_options: {function: NilToNA})).must_equal({"id"=>"n/a"})
+    _(decorator.to_hash(user_options: {function: nil})).must_equal({"id"=>"n/a"}) # non-sense function is not applied.
   end
 
 end
@@ -56,12 +56,12 @@ class ParsePipelineOptionTest < MiniTest::Spec
     end
   end
 
-  it { representer.new(Album.new).from_hash({"id"=>nil}, user_options: {function: NilToNA}).id.must_equal "n/a" }
-  it { representer.new(Album.new(1)).to_hash(user_options: {function: NilToNA}).must_equal({"id"=>1}) }
+  it { _(representer.new(Album.new).from_hash({"id"=>nil}, user_options: {function: NilToNA}).id).must_equal "n/a" }
+  it { _(representer.new(Album.new(1)).to_hash(user_options: {function: NilToNA})).must_equal({"id"=>1}) }
 
   it "is cached" do
     decorator = representer.new(Album.new)
-    decorator.from_hash({"id"=>nil}, user_options: {function: NilToNA}).id.must_equal "n/a"
-    decorator.from_hash({"id"=>nil}, user_options: {function: "nonsense"}).id.must_equal "n/a" # non-sense function is not applied.
+    _(decorator.from_hash({"id"=>nil}, user_options: {function: NilToNA}).id).must_equal "n/a"
+    _(decorator.from_hash({"id"=>nil}, user_options: {function: "nonsense"}).id).must_equal "n/a" # non-sense function is not applied.
   end
 end

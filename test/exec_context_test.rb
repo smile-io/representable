@@ -7,8 +7,8 @@ class ExecContextTest < MiniTest::Spec
     # :yaml => [Representable::YAML, "---\nsong:\n  name: Alive\n", "---\nsong:\n  name: You've Taken Everything\n"],
   ) do |format, mod, input, output|
 
-    let (:song) { representer.prepare(Song.new("Timing")) }
-    let (:format) { format }
+    let(:song) { representer.prepare(Song.new("Timing")) }
+    let(:format) { format }
 
 
     describe "exec_context: nil" do
@@ -17,7 +17,7 @@ class ExecContextTest < MiniTest::Spec
       end
 
       it { render(song).must_equal_document output }
-      it { parse(song, input).name.must_equal "Rebel Fate" }
+      it { _(parse(song, input).name).must_equal "Rebel Fate" }
     end
 
 
@@ -27,7 +27,7 @@ class ExecContextTest < MiniTest::Spec
       end
 
       it { render(song).must_equal_document output }
-      it { parse(song, input).name.must_equal "Rebel Fate" }
+      it { _(parse(song, input).name).must_equal "Rebel Fate" }
     end
 
 
@@ -41,7 +41,7 @@ class ExecContextTest < MiniTest::Spec
       end
 
       it { render(song).must_equal_document({Representable::Hash::Binding => "name"}) }
-      it { parse(song, {Representable::Hash::Binding => "Rebel Fate"}).name.must_equal "Rebel Fate" }
+      it { _(parse(song, {Representable::Hash::Binding => "Rebel Fate"}).name).must_equal "Rebel Fate" }
     end
 
 
@@ -53,7 +53,7 @@ class ExecContextTest < MiniTest::Spec
         end
 
         it { render(song).must_equal_document output }
-        it { parse(song, input).name.must_equal "Rebel Fate" }
+        it { _(parse(song, input).name).must_equal "Rebel Fate" }
       end
 
 
@@ -71,7 +71,7 @@ class ExecContextTest < MiniTest::Spec
         end
 
         it { render(song).must_equal_document({Representable::Decorator=>"Timebomb"}) }
-        it { parse(song, {Representable::Decorator=>"Listless"}).name.must_equal "Listless" }
+        it { _(parse(song, {Representable::Decorator=>"Listless"}).name).must_equal "Listless" }
       end
 
 
@@ -86,7 +86,7 @@ class ExecContextTest < MiniTest::Spec
         end
 
         it { render(song).must_equal_document({Representable::Hash::Binding => "name"}) }
-        it("xxx") { parse(song, {Representable::Hash::Binding => "Rebel Fate"}).name.must_equal "Rebel Fate" }
+        it("xxx") { _(parse(song, {Representable::Hash::Binding => "Rebel Fate"}).name).must_equal "Rebel Fate" }
       end
     end
   end
