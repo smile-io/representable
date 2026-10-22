@@ -13,10 +13,10 @@ jobs:
       fail-fast: false
       matrix:
         ruby: [2.5, 2.6, 2.7, '3.0', "3.1"]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # no Ubuntu 26.04 Ruby setup for this job yet (INF-1047)
     steps:
-    - uses: actions/checkout@v2
-    - uses: ruby/setup-ruby@v1
+    - uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2.8.0
+    - uses: ruby/setup-ruby@b1da4809b005e0178fe08a1d57317bffc00b7b4c # v1.332.0
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
